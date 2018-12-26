@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#0024ed</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimary">#304ffe</color>
+    <color name="colorPrimaryDark">#0d47a1</color>
     <color name="colorAccent">#d81b21</color>
     <color name="tabTextSelectedColor">#ffffff</color>
     <color name="tabTextUnselectedColor">#a4ffffff</color>
+    <color name="listitem_background">#ffffffff</color>
 </resources>

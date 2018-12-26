@@ -12,6 +12,7 @@
         android:layout_height="70dp"
         android:layout_margin="5dp"
         android:contentDescription="@string/album_img_desc_ph"
+        android:foreground="@drawable/rounded_image_fg"
         android:scaleType="fitXY"
         tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
