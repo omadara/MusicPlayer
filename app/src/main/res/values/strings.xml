@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">MusicPlayer</string>
+    <string name="app_name">Music Player</string>
+    <string name="tabItemAlbums">ALBUMS</string>
+    <string name="tabItemArtists">ARTISTS</string>
+    <string name="tabItemPlaylists">PLAYLISTS</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
