@@ -4,6 +4,9 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -14,6 +17,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().setElevation(0); //remove actionbar shadow
         initTabLayout();
+
+        RestClient.getInstance(this).getAlbums(new RestClient.Callback<List<Album>>() {
+            @Override
+            public void onCall(List<Album> albums) {
+                for(Album album : albums) {
+                    Log.i("musicplayer test", album.toString());
+                }
+            }
+        });
     }
 
     private void initTabLayout() {
