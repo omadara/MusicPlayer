@@ -5,10 +5,9 @@
     android:layout_height="match_parent"
     tools:context=".AlbumsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/albums_rv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
-
+        tools:listitem="@layout/album_item" />
 </FrameLayout>
