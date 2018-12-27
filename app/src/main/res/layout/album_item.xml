@@ -20,38 +20,48 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/album_img"
-        android:layout_toStartOf="@id/duration"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="5dp"
-        android:text="@string/album_title_ph"
+        android:layout_marginEnd="12dp"
+        android:layout_toEndOf="@+id/album_img"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:text="Album Title" />
 
     <TextView
         android:id="@+id/artist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/title"
-        android:layout_toEndOf="@id/album_img"
-        android:layout_toStartOf="@id/duration"
-        android:text="@string/album_artist_ph"
-        android:textSize="16sp" />
+        android:layout_alignStart="@+id/title"
+        android:textSize="16sp"
+        tools:text="Artist" />
 
     <TextView
         android:id="@+id/songs_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/artist"
-        android:layout_toEndOf="@id/album_img"
-        android:layout_toStartOf="@id/duration"
-        android:text="@string/album_songs_cnt_ph" />
+        android:layout_alignStart="@+id/title"
+        tools:text="12 songs" />
 
     <TextView
         android:id="@+id/duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/title"
+        android:layout_below="@+id/title"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="5dp"
-        android:text="@string/album_duration_ph" />
+        android:layout_marginEnd="12dp"
+        tools:text="13:12" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_below="@+id/album_img"
+        android:layout_alignStart="@+id/title"
+        android:background="@android:color/darker_gray" />
+
 </RelativeLayout>

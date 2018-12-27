@@ -1,22 +1,21 @@
 package edu.unipi.students.omadara.musicplayer;
 
+import android.graphics.Bitmap;
+
 public class Album {
+    private String id;
     private String title;
     private String artist;
-    private String duration;
-    private String songs_cnt;
-    private int image; //TODO bitmap instead of id
+    private int trackCount;
+    private int duration;
+    private Bitmap thumbnail;
 
-    public Album() {
-        ;;
+    public String getId() {
+        return id;
     }
 
-    public Album(String title, String artist, String duration, String songs_cnt, int image) {
-        this.title = title;
-        this.artist = artist;
-        this.duration = duration;
-        this.songs_cnt = songs_cnt;
-        this.image = image;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -35,29 +34,33 @@ public class Album {
         this.artist = artist;
     }
 
-    public String getDuration() {
+    public int getTrackCount() {
+        return trackCount;
+    }
+
+    public void setTrackCount(int trackCount) {
+        this.trackCount = trackCount;
+    }
+
+    public int getDuration() {
         return duration;
     }
 
-    public void setDuration(String duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
 
-    public String getSongs_cnt() {
-        return songs_cnt;
+    public Bitmap getThumbnail() {
+        return thumbnail;
     }
 
-    public void setSongs_cnt(String songs_cnt) {
-        this.songs_cnt = songs_cnt;
+    public void setThumbnail(Bitmap thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
-    public int getImage() {
-        return image;
+    @Override
+    public String toString() {
+        return "Album[id=" + getId() + ", title=" + getTitle() + ", artist=" + getArtist()
+                + ", trackCount=" + getTrackCount() + ", duration=" + getDuration() + ", thumbnail="+getThumbnail();
     }
-
-    public void setImage(int image) {
-        this.image = image;
-    }
-
-
 }

@@ -30,18 +30,12 @@ public class AlbumsFragment extends Fragment {
         recyclerView = view.findViewById(R.id.albums_rv);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-        //TODO earbits requests
-        List<Album> albumList = new ArrayList<Album>();
-        albumList.add(new Album("Test Title", "Test Artist", "33:33", "3 songs", R.drawable.ic_launcher_foreground));
-        albumList.add(new Album("New Album", "ArrrrTttttsssst", "133:33", "33 songs", R.drawable.ic_launcher_foreground));
-        albumList.add(new Album("Title Title", "5 Artist", "33:33", "6 songs", R.drawable.ic_launcher_foreground));
-        albumList.add(new Album("TTT Title", "Earbits", "13:11", "13 songs", R.drawable.ic_launcher_foreground));
-        albumList.add(new Album("RRR Title", "Test", "11:35", "23 songs", R.drawable.ic_launcher_foreground));
-
-        recyclerView.setAdapter(new AlbumAdapter(albumList));
-        DividerItemDecoration divider = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
-        recyclerView.addItemDecoration(divider);
-
+        RestClient.getInstance(this.getContext()).getAlbums(new RestClient.Callback<List<Album>>() {
+            @Override
+            public void onCall(List<Album> albums) {
+                recyclerView.setAdapter(new AlbumAdapter(albums));
+            }
+        }, null);
         return view;
     }
 }
