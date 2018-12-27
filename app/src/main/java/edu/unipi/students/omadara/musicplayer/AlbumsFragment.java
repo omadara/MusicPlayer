@@ -18,6 +18,7 @@ import java.util.List;
 
 public class AlbumsFragment extends Fragment {
     private RecyclerView recyclerView;
+    private OnAlbumsFragmentInteractionListener mListener;
 
     public AlbumsFragment() {
         // Required empty public constructor
@@ -37,9 +38,30 @@ public class AlbumsFragment extends Fragment {
             public void onCall(List<Album> albums) {
                 loading.setVisibility(View.INVISIBLE);
                 recyclerView.setVisibility(View.VISIBLE);
-                recyclerView.setAdapter(new AlbumAdapter(albums));
+                recyclerView.setAdapter(new AlbumAdapter(albums, mListener));
             }
         }, 3, null);
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnAlbumsFragmentInteractionListener) {
+            mListener = (OnAlbumsFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnAlbumsFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    public interface OnAlbumsFragmentInteractionListener {
+        void onAlbumClick(Album album);
     }
 }

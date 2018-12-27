@@ -1,5 +1,6 @@
 package edu.unipi.students.omadara.musicplayer;
 
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +10,7 @@ import android.util.Log;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AlbumsFragment.OnAlbumsFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,5 +35,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+    }
+
+    @Override
+    public void onAlbumClick(Album album) {
+        Snackbar.make(findViewById(R.id.viewPager), "Clicked album "
+                + album.getTitle() + ". TODO open_musicplayer(album)", Snackbar.LENGTH_SHORT).show();
     }
 }
