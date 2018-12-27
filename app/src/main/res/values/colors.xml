@@ -5,5 +5,5 @@
     <color name="colorAccent">#d81b21</color>
     <color name="tabTextSelectedColor">#ffffff</color>
     <color name="tabTextUnselectedColor">#a4ffffff</color>
-    <color name="listitem_background">#ffffffff</color>
+    <color name="listitem_background">#ffffff</color>
 </resources>
