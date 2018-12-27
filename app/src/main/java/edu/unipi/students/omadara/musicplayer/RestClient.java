@@ -41,14 +41,15 @@ public class RestClient {
         requestQueue.start();
     }
 
-    public void getAlbums(final Callback<List<Album>> callback, final Response.ErrorListener errorListener) {
+    public void getAlbums(final Callback<List<Album>> callback, final int maxNumber, final Response.ErrorListener errorListener) {
         final String albumsUrl = BASE_ENDPOINT + "/albums";
         final Object getAlbumsTag = new Object();
         requestQueue.add(new JsonArrayRequest(Request.Method.GET, albumsUrl, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(final JSONArray jsonAlbums) {
                 final List<Album> albums = new ArrayList<>();
-                for(int i = 0; i < jsonAlbums.length(); i++) {
+                final int N = Math.min(maxNumber, jsonAlbums.length());
+                for(int i = 0; i < N; i++) {
                     try {
                         JSONObject jsonAlbum = jsonAlbums.getJSONObject(i);
                         final Album album = new Album();
@@ -83,7 +84,7 @@ public class RestClient {
                     }
                 }
                 requestQueue.addRequestFinishedListener(new RequestFinishedListener<Object>() {
-                    int awaitingRequests = jsonAlbums.length()*2;
+                    int awaitingRequests = N * 2;
                     @Override
                     public void onRequestFinished(Request<Object> request) {
                         if(request.getTag() == getAlbumsTag && --awaitingRequests == 0) {

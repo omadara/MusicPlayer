@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private void initTabLayout() {
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         ViewPager pager = findViewById(R.id.viewPager);
+        pager.setOffscreenPageLimit(2);//fortwnei mexri kai 2 geitonika tabs
         pager.setAdapter(new MyFragmentPagerAdapter(getSupportFragmentManager()));
         tabLayout.setupWithViewPager(pager);
         tabLayout.getTabAt(0).setText(R.string.tabItemAlbums);
@@ -29,4 +30,9 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(2).setText(R.string.tabItemPlaylists);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+    }
 }

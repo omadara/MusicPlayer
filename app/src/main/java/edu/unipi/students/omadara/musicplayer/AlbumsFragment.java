@@ -35,7 +35,7 @@ public class AlbumsFragment extends Fragment {
             public void onCall(List<Album> albums) {
                 recyclerView.setAdapter(new AlbumAdapter(albums));
             }
-        }, null);
+        }, 3, null);
         return view;
     }
 }
