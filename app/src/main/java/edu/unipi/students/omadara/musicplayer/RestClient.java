@@ -2,13 +2,14 @@ package edu.unipi.students.omadara.musicplayer;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.v4.util.LruCache;
+import android.util.Log;
+import android.widget.ImageView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.RequestQueue.RequestFinishedListener;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -26,7 +27,6 @@ public class RestClient {
     private static RestClient instance;
     private static final String BASE_ENDPOINT = "https://api-core.earbits.com/v1";
     private RequestQueue requestQueue;
-    private ImageLoader imageLoader;
 
 
     public static synchronized RestClient getInstance(Context context) {
@@ -39,27 +39,15 @@ public class RestClient {
     private RestClient(Context context) {
         requestQueue = Volley.newRequestQueue(context.getApplicationContext());
         requestQueue.start();
-        imageLoader = new ImageLoader(requestQueue, new ImageLoader.ImageCache() {
-            private final LruCache<String, Bitmap> cache = new LruCache<String, Bitmap>(20);
-
-            @Override
-            public Bitmap getBitmap(String url) {
-                return cache.get(url);
-            }
-
-            @Override
-            public void putBitmap(String url, Bitmap bitmap) {
-                cache.put(url, bitmap);
-            }
-        });
     }
 
-    public void getAlbums(final Callback<List<Album>> callback) {
+    public void getAlbums(final Callback<List<Album>> callback, final Response.ErrorListener errorListener) {
         final String albumsUrl = BASE_ENDPOINT + "/albums";
+        final Object getAlbumsTag = new Object();
         requestQueue.add(new JsonArrayRequest(Request.Method.GET, albumsUrl, null, new Response.Listener<JSONArray>() {
             @Override
-            public void onResponse(JSONArray jsonAlbums) {
-                List<Album> albums = new ArrayList<>();
+            public void onResponse(final JSONArray jsonAlbums) {
+                final List<Album> albums = new ArrayList<>();
                 for(int i = 0; i < jsonAlbums.length(); i++) {
                     try {
                         JSONObject jsonAlbum = jsonAlbums.getJSONObject(i);
@@ -68,17 +56,13 @@ public class RestClient {
                         album.setTitle(jsonAlbum.getString("name"));
                         album.setArtist(jsonAlbum.getString("artist_name"));
                         album.setTrackCount(jsonAlbum.getInt("track_count"));
-                        imageLoader.get(jsonAlbum.getString("cover_image_thumb_nail"), new ImageLoader.ImageListener() {
+                        String thumbUrl = jsonAlbum.getString("cover_image_thumb_url").replaceFirst("http:","https:");
+                        requestQueue.add(new ImageRequest(thumbUrl, new Response.Listener<Bitmap>() {
                             @Override
-                            public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                                album.setThumbnail(response.getBitmap());
+                            public void onResponse(Bitmap bitmap) {
+                                album.setThumbnail(bitmap);
                             }
-
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-
-                            }
-                        });
+                        }, 0, 0, ImageView.ScaleType.CENTER_CROP, Bitmap.Config.RGB_565, errorListener).setTag(getAlbumsTag));
                         requestQueue.add(new JsonArrayRequest(Request.Method.GET, albumsUrl + "/" + album.getId() + "/tracks", null, new Response.Listener<JSONArray>() {
                             @Override
                             public void onResponse(JSONArray jsonTracks) {
@@ -86,26 +70,29 @@ public class RestClient {
                                 for(int j = 0; j < jsonTracks.length(); j++) {
                                     try {
                                         totalDuration += jsonTracks.getJSONObject(j).getInt("duration");
-                                    } catch (JSONException e) { }
+                                    } catch (JSONException e) {
+                                        Log.e("musicplayer", "JSONException trying to read a track duration.", e);
+                                    }
                                 }
                                 album.setDuration(totalDuration);
                             }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-
-                            }
-                        }));
+                        }, errorListener).setTag(getAlbumsTag));
                         albums.add(album);
-                    } catch (JSONException e) { }
+                    } catch (JSONException e) {
+                        Log.e("musicplayer", "JSONException trying to read from an album json.", e);
+                    }
                 }
-                callback.onCall(albums);
+                requestQueue.addRequestFinishedListener(new RequestFinishedListener<Object>() {
+                    int awaitingRequests = jsonAlbums.length()*2;
+                    @Override
+                    public void onRequestFinished(Request<Object> request) {
+                        if(request.getTag() == getAlbumsTag && --awaitingRequests == 0) {
+                            requestQueue.removeRequestFinishedListener(this);
+                            callback.onCall(albums);
+                        }
+                    }
+                });
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        }));
+        }, errorListener).setTag(getAlbumsTag));
     }
 }

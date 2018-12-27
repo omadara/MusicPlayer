@@ -61,6 +61,6 @@ public class Album {
     @Override
     public String toString() {
         return "Album[id=" + getId() + ", title=" + getTitle() + ", artist=" + getArtist()
-                + ", trackCount=" + getTrackCount() + ", duration=" + getDuration() + ", thumbnail="+getThumbnail().toString();
+                + ", trackCount=" + getTrackCount() + ", duration=" + getDuration() + ", thumbnail="+getThumbnail();
     }
 }

@@ -10,6 +10,7 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
+    private List<Album> albums;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,15 +18,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().setElevation(0); //remove actionbar shadow
         initTabLayout();
-
-        RestClient.getInstance(this).getAlbums(new RestClient.Callback<List<Album>>() {
-            @Override
-            public void onCall(List<Album> albums) {
-                for(Album album : albums) {
-                    Log.i("musicplayer test", album.toString());
-                }
-            }
-        });
     }
 
     private void initTabLayout() {
