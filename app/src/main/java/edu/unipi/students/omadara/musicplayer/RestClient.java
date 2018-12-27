@@ -41,7 +41,7 @@ public class RestClient {
         requestQueue.start();
     }
 
-    public void getAlbums(final Callback<List<Album>> callback, final int maxNumber, final Response.ErrorListener errorListener) {
+    public void requestAlbums(final Callback<List<Album>> callback, final int maxNumber, final Response.ErrorListener errorListener) {
         final String albumsUrl = BASE_ENDPOINT + "/albums";
         final Object getAlbumsTag = new Object();
         requestQueue.add(new JsonArrayRequest(Request.Method.GET, albumsUrl, null, new Response.Listener<JSONArray>() {
@@ -95,5 +95,28 @@ public class RestClient {
                 });
             }
         }, errorListener).setTag(getAlbumsTag));
+    }
+
+    public void requestAlbumTracks(String albumId, final Callback<List<Track>> callback, Response.ErrorListener errorListener) {
+        String tracksUrl = BASE_ENDPOINT + "/albums/" + albumId + "/tracks";
+        requestQueue.add(new JsonArrayRequest(Request.Method.GET, tracksUrl, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray jsonTracks) {
+                List<Track> tracks = new ArrayList<>();
+                for(int i = 0; i < jsonTracks.length(); i++) {
+                    try {
+                        JSONObject jsonTrack = jsonTracks.getJSONObject(i);
+                        Track track = new Track();
+                        track.setName(jsonTrack.getString("name"));
+                        track.setDuration(jsonTrack.getInt("duration"));
+                        track.setMediaUrl(jsonTrack.getString("media_file"));
+                        tracks.add(track);
+                    } catch (JSONException e) {
+                        Log.e("musicplayer", "JSONException trying to read a track.", e);
+                    }
+                }
+                callback.onCall(tracks);
+            }
+        }, errorListener));
     }
 }

@@ -34,8 +34,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
         viewHolder.image.setImageBitmap(a.getThumbnail());
         viewHolder.songs_count.setText(a.getTrackCount() + " songs");
         int duration = a.getDuration() / 1000;
-        String durationText = (duration / 60) + ":" + (duration % 60);
-        viewHolder.duration.setText(durationText);
+        viewHolder.duration.setText(String.format("%d:%02d", duration / 60, duration % 60));
     }
 
     @Override

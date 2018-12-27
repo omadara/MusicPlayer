@@ -30,7 +30,7 @@ public class AlbumsFragment extends Fragment {
         recyclerView = view.findViewById(R.id.albums_rv);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-        RestClient.getInstance(this.getContext()).getAlbums(new RestClient.Callback<List<Album>>() {
+        RestClient.getInstance(this.getContext()).requestAlbums(new RestClient.Callback<List<Album>>() {
             @Override
             public void onCall(List<Album> albums) {
                 recyclerView.setAdapter(new AlbumAdapter(albums));
