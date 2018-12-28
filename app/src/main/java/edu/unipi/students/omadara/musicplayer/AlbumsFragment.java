@@ -3,20 +3,20 @@ package edu.unipi.students.omadara.musicplayer;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
 public class AlbumsFragment extends Fragment {
+    public interface OnAlbumsFragmentInteractionListener {
+        void onAlbumClick(Album album);
+    }
     private RecyclerView recyclerView;
     private OnAlbumsFragmentInteractionListener mListener;
 
@@ -55,13 +55,4 @@ public class AlbumsFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface OnAlbumsFragmentInteractionListener {
-        void onAlbumClick(Album album);
-    }
 }

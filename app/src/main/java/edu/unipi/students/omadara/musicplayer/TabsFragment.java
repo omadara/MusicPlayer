@@ -28,7 +28,7 @@ public class TabsFragment extends Fragment {
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
         ViewPager pager = view.findViewById(R.id.viewPager);
         pager.setOffscreenPageLimit(2);//fortwnei mexri kai 2 geitonika tabs
-        pager.setAdapter(new MyFragmentPagerAdapter(getFragmentManager()));
+        pager.setAdapter(new MyFragmentPagerAdapter(getChildFragmentManager()));
         tabLayout.setupWithViewPager(pager);
         tabLayout.getTabAt(0).setText(R.string.tabItemAlbums);
         tabLayout.getTabAt(1).setText(R.string.tabItemArtists);

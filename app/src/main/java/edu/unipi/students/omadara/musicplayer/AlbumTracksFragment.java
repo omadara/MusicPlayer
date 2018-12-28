@@ -23,6 +23,7 @@ public class AlbumTracksFragment extends Fragment {
         album.setId(args.getString("id"));
         album.setTitle(args.getString("title"));
         album.setArtist(args.getString("artist"));
+        getActivity().setTitle(album.getTitle());
         // TODO create xml to show list of album's songs
         return inflater.inflate(/*replace me*/ R.layout.fragment_artists, container, false);
     }
