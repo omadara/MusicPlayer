@@ -12,19 +12,116 @@
         android:id="@+id/mainFragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/secondaryFragmentContainer"
-        android:layout_alignParentTop="true"
-        tools:background="@android:color/holo_blue_dark">
+        android:layout_above="@+id/playerContainer"
+        android:layout_alignParentTop="true">
 
     </FrameLayout>
 
-    <FrameLayout
-        android:id="@+id/secondaryFragmentContainer"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/playerContainer"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="84dp"
+        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        tools:background="@android:color/holo_red_light"
-        app:layout_constraintTop_toBottomOf="@+id/mainFragmentContainer">
+        android:layout_marginBottom="0dp"
+        android:background="@color/playerBackgroundPlayingColor"
+        android:elevation="40dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/mainFragmentContainer"
+        tools:visibility="visible">
 
-    </FrameLayout>
+        <Button
+            android:id="@+id/buttonStop"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/buttonStopColor"
+            android:elevation="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/tvDuration"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:max="1000"
+            android:progressDrawable="@drawable/seekbar"
+            android:theme="@style/AppTheme"
+            app:layout_constraintBottom_toBottomOf="@+id/tvCurrentTime"
+            app:layout_constraintEnd_toStartOf="@+id/tvDuration"
+            app:layout_constraintStart_toEndOf="@+id/tvCurrentTime"
+            app:layout_constraintTop_toTopOf="@+id/tvCurrentTime"
+            tools:progress="500" />
+
+        <TextView
+            android:id="@+id/tvCurrentTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="1:38" />
+
+        <TextView
+            android:id="@+id/tvDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/seekBar"
+            tools:text="5:17" />
+
+        <TextView
+            android:id="@+id/tvTrackName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/seekBar"
+            app:layout_constraintEnd_toStartOf="@+id/buttonPlayPause"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Song Name " />
+
+        <Button
+            android:id="@+id/buttonPlayPause"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/ic_play"
+            android:backgroundTint="@android:color/white"
+            android:elevation="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/tvDuration"
+            app:layout_constraintEnd_toStartOf="@+id/buttonStop"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </android.support.constraint.ConstraintLayout>
 </RelativeLayout>

@@ -2,8 +2,11 @@
 <resources>
     <color name="colorPrimary">#304ffe</color>
     <color name="colorPrimaryDark">#0d47a1</color>
-    <color name="colorAccent">#d81b21</color>
+    <color name="colorAccent">#0d47a1</color>
     <color name="tabTextSelectedColor">#ffffff</color>
     <color name="tabTextUnselectedColor">#a4ffffff</color>
     <color name="listitem_background">#ffffff</color>
+    <color name="buttonStopColor">#abb8fe</color>
+    <color name="playerBackgroundPlayingColor">#304ffe</color>
+    <color name="playerBackgroundPausedColor">#1a237e</color>
 </resources>
