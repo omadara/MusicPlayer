@@ -67,10 +67,10 @@ public class RestClient {
                         requestQueue.add(new JsonArrayRequest(Request.Method.GET, albumsUrl + "/" + album.getId() + "/tracks", null, new Response.Listener<JSONArray>() {
                             @Override
                             public void onResponse(JSONArray jsonTracks) {
-                                int totalDuration = 0;
+                                long totalDuration = 0;
                                 for(int j = 0; j < jsonTracks.length(); j++) {
                                     try {
-                                        totalDuration += jsonTracks.getJSONObject(j).getInt("duration");
+                                        totalDuration += jsonTracks.getJSONObject(j).getLong("duration");
                                     } catch (JSONException e) {
                                         Log.e("musicplayer", "JSONException trying to read a track duration.", e);
                                     }

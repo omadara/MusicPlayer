@@ -34,6 +34,10 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         btnPlayPause.setOnClickListener(this);
         btnStop.setOnClickListener(this);
         seekBar.setOnSeekBarChangeListener(this);
+
+        Track DELETEME = new Track();
+        DELETEME.setDuration(66666);
+        onTrackClick(DELETEME);
     }
 
     @Override
@@ -81,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         seekBar.setProgress(0);
         tvTrackName.setText(track.getName());
         tvCurrentTime.setText("0:00");
-        tvDuration.setText(String.format("%d:%02d", track.getDuration()));
+        tvDuration.setText(Utils.durationToString(track.getDuration()));
         playing = true;
     }
 

@@ -2,7 +2,7 @@ package edu.unipi.students.omadara.musicplayer;
 
 public class Track {
     private String name;
-    private int duration;
+    private long duration;
     private String mediaUrl;
 
     public String getName() {
@@ -13,11 +13,11 @@ public class Track {
         this.name = name;
     }
 
-    public int getDuration() {
+    public long getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 
