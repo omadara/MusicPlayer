@@ -10,15 +10,16 @@ import android.widget.TextView;
 
 import edu.unipi.students.omadara.musicplayer.AlbumsFragment.OnAlbumsFragmentInteractionListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> {
     private List<Album> albumList;
     private OnAlbumsFragmentInteractionListener mListener;
 
-    public AlbumAdapter(List<Album> albumList, OnAlbumsFragmentInteractionListener mListener) {
-        this.albumList = albumList;
+    public AlbumAdapter(OnAlbumsFragmentInteractionListener mListener) {
         this.mListener = mListener;
+        this.albumList = new ArrayList<Album>();
     }
 
     @NonNull
@@ -52,6 +53,11 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
     @Override
     public int getItemCount() {
         return albumList.size();
+    }
+
+    public void addAlbum(Album album) {
+        albumList.add(album);
+        notifyItemInserted(albumList.size() - 1);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

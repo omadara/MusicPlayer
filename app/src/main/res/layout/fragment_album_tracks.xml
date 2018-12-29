@@ -1,33 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AlbumTracksFragment">
 
-    <RelativeLayout
+    <include
+        android:id="@+id/album"
+        layout="@layout/album_item" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="wrap_content"
+        android:layout_height="2dp"
+        android:layout_below="@+id/album"
+        android:layout_marginTop="-2dp"
+        android:background="@android:color/darker_gray" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/tracks_rv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:layout_below="@id/divider"
+        tools:listitem="@layout/track_item" />
 
-        <include
-            android:id="@+id/album"
-            layout="@layout/album_item" />
-
-        <View
-            android:id="@+id/divider"
-            android:layout_width="wrap_content"
-            android:layout_below="@+id/album"
-            android:layout_height="5dp"
-            android:layout_marginTop="-2dp"
-            android:background="@color/colorPrimary" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/tracks_rv"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/divider"
-            tools:listitem="@layout/track_item" />
-
-    </RelativeLayout>
-
-</FrameLayout>
+</RelativeLayout>

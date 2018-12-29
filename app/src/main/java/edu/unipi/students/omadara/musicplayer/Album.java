@@ -7,7 +7,7 @@ public class Album {
     private String title;
     private String artist;
     private int trackCount;
-    private long duration;
+    private int duration;
     private Bitmap thumbnail;
 
     public String getId() {
@@ -42,11 +42,11 @@ public class Album {
         this.trackCount = trackCount;
     }
 
-    public long getDuration() {
+    public int getDuration() {
         return duration;
     }
 
-    public void setDuration(long duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
 

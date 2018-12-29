@@ -8,13 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> {
     private List<Track> trackList;
 
-    public TrackAdapter(List<Track> trackList) {
-        this.trackList = trackList;
+    public TrackAdapter() {
+        this.trackList = new ArrayList<Track>();
     }
 
     @NonNull
@@ -31,7 +32,6 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
         viewHolder.track = t;
         viewHolder.name.setText(t.getName());
         viewHolder.duration.setText(Utils.durationToString(t.getDuration()));
-        //viewHolder.image.....
 
         //TODO click listeners interface
     }
@@ -39,6 +39,11 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
     @Override
     public int getItemCount() {
         return trackList.size();
+    }
+
+    public void addTrack(Track track) {
+        trackList.add(track);
+        notifyItemInserted(trackList.size() - 1);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

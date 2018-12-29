@@ -61,12 +61,8 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
 
     @Override
     public void onAlbumClick(Album album) {
-        Fragment fragment = new AlbumTracksFragment();
-        Bundle args = new Bundle();
-        args.putString("id", album.getId());
-        args.putString("title", album.getTitle());
-        args.putString("artist", album.getArtist());
-        fragment.setArguments(args);
+        AlbumTracksFragment fragment = new AlbumTracksFragment();
+        fragment.setAlbum(album);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.mainFragmentContainer, fragment)
                 .addToBackStack(null).commit();

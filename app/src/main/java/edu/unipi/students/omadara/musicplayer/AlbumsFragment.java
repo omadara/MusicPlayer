@@ -10,15 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class AlbumsFragment extends Fragment {
     public interface OnAlbumsFragmentInteractionListener {
         void onAlbumClick(Album album);
     }
-    private RecyclerView recyclerView;
+    private AlbumAdapter adapter;
     private OnAlbumsFragmentInteractionListener mListener;
 
     public AlbumsFragment() {
@@ -30,24 +27,19 @@ public class AlbumsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_albums, container, false);
 
         Context context = view.getContext();
-        recyclerView = view.findViewById(R.id.albums_rv);
+        RecyclerView recyclerView = view.findViewById(R.id.albums_rv);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-
-        List<Album> albums = new ArrayList<Album>();
-        recyclerView.setAdapter(new AlbumAdapter(albums, mListener));
+        adapter = new AlbumAdapter(mListener);
+        recyclerView.setAdapter(adapter);
 
         final ProgressBar loading = view.findViewById(R.id.progressBar);
-        RestClient.getInstance(this.getContext()).requestAlbums(new RestClient.Callback<List<Album>>() {
+        RestClient.getInstance(this.getContext()).requestAlbums(new RestClient.Callback<Album>() {
             @Override
-            public void onAllRequestsFinished(List<Album> albums) {
-                loading.setVisibility(View.INVISIBLE);
+            public void onRequestFinished(Album album, boolean isLast) {
+                adapter.addAlbum(album);
+                if(isLast) loading.setVisibility(View.INVISIBLE);
             }
-
-            @Override
-            public void onRequestFinished(List<Album> albums) {
-                recyclerView.getAdapter().notifyDataSetChanged();
-            }
-        }, 10, albums, null);
+        }, 10, null);
         return view;
     }
 
