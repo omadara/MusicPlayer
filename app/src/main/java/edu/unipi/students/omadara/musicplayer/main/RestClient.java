@@ -1,4 +1,4 @@
-package edu.unipi.students.omadara.musicplayer;
+package edu.unipi.students.omadara.musicplayer.main;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -16,7 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
+import edu.unipi.students.omadara.musicplayer.models.Album;
+import edu.unipi.students.omadara.musicplayer.models.Track;
 
 public class RestClient {
     public interface Callback<T> {

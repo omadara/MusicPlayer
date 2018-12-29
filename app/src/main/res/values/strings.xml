@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Music Player</string>
     <string name="tabItemAlbums">ALBUMS</string>
-    <string name="tabItemArtists">ARTISTS</string>
+    <string name="tabItemGenres">GENRES</string>
     <string name="tabItemPlaylists">PLAYLISTS</string>
 
     <!-- TODO: Remove or change this placeholder text -->

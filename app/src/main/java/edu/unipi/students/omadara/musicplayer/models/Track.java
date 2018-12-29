@@ -1,4 +1,4 @@
-package edu.unipi.students.omadara.musicplayer;
+package edu.unipi.students.omadara.musicplayer.models;
 
 public class Track {
     private String name;

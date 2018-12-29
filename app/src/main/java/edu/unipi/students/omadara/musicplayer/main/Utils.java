@@ -1,4 +1,4 @@
-package edu.unipi.students.omadara.musicplayer;
+package edu.unipi.students.omadara.musicplayer.main;
 
 public class Utils {
     public static String durationToString(long duration) {

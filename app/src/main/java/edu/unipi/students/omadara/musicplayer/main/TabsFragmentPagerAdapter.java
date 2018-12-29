@@ -1,13 +1,16 @@
-package edu.unipi.students.omadara.musicplayer;
+package edu.unipi.students.omadara.musicplayer.main;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import edu.unipi.students.omadara.musicplayer.albums.AlbumsFragment;
+import edu.unipi.students.omadara.musicplayer.genres.GenresFragment;
 
-public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
+
+public class TabsFragmentPagerAdapter extends FragmentPagerAdapter {
     private final Fragment[] fragments = new Fragment[3];
-    public MyFragmentPagerAdapter(FragmentManager fm) {
+    public TabsFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
@@ -16,7 +19,7 @@ public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
         if(fragments[position] == null) {
             switch (position) {
                 case 0: fragments[position] = new AlbumsFragment(); break;
-                case 1: fragments[position] = new ArtistsFragment(); break;
+                case 1: fragments[position] = new GenresFragment(); break;
                 case 2: fragments[position] = new PlaylistsFragment(); break;
             }
         }

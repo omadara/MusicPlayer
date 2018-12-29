@@ -1,4 +1,4 @@
-package edu.unipi.students.omadara.musicplayer;
+package edu.unipi.students.omadara.musicplayer.main;
 
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
@@ -14,6 +14,12 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.IOException;
+
+import edu.unipi.students.omadara.musicplayer.R;
+import edu.unipi.students.omadara.musicplayer.albums.AlbumTracksFragment;
+import edu.unipi.students.omadara.musicplayer.albums.AlbumsFragment;
+import edu.unipi.students.omadara.musicplayer.models.Album;
+import edu.unipi.students.omadara.musicplayer.models.Track;
 
 
 public class MainActivity extends AppCompatActivity implements AlbumsFragment.AlbumEventListener, AlbumTracksFragment.TrackEventListener,

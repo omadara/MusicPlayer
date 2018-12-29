@@ -1,4 +1,4 @@
-package edu.unipi.students.omadara.musicplayer;
+package edu.unipi.students.omadara.musicplayer.albums;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -8,7 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import edu.unipi.students.omadara.musicplayer.AlbumsFragment.AlbumEventListener;
+import edu.unipi.students.omadara.musicplayer.R;
+import edu.unipi.students.omadara.musicplayer.albums.AlbumsFragment.AlbumEventListener;
+import edu.unipi.students.omadara.musicplayer.main.Utils;
+import edu.unipi.students.omadara.musicplayer.models.Album;
 
 import java.util.ArrayList;
 import java.util.List;

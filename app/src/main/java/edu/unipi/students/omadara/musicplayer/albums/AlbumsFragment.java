@@ -1,4 +1,4 @@
-package edu.unipi.students.omadara.musicplayer;
+package edu.unipi.students.omadara.musicplayer.albums;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -9,6 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+
+import edu.unipi.students.omadara.musicplayer.R;
+import edu.unipi.students.omadara.musicplayer.main.RestClient;
+import edu.unipi.students.omadara.musicplayer.models.Album;
 
 
 public class AlbumsFragment extends Fragment {

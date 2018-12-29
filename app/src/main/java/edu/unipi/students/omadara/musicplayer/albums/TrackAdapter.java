@@ -1,4 +1,4 @@
-package edu.unipi.students.omadara.musicplayer;
+package edu.unipi.students.omadara.musicplayer.albums;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +11,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.unipi.students.omadara.musicplayer.AlbumTracksFragment.TrackEventListener;
+import edu.unipi.students.omadara.musicplayer.R;
+import edu.unipi.students.omadara.musicplayer.albums.AlbumTracksFragment.TrackEventListener;
+import edu.unipi.students.omadara.musicplayer.main.Utils;
+import edu.unipi.students.omadara.musicplayer.models.Track;
 
 public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> {
     private List<Track> trackList;
