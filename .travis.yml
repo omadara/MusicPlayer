@@ -1,0 +1,80 @@
+language: android
+jdk:
+- oraclejdk8
+
+env:
+  global:
+    - APPNAME="MusicPlayer"
+    - OWNER=${TRAVIS_REPO_SLUG%/*}
+    - DEV=${OWNER/omadara/dev}
+    - BRANCH=${TRAVIS_BRANCH/master/}
+    - SEP=$([ -n "$BRANCH" ] && echo '-')
+
+android:
+  components:
+    - tools
+    - platform-tools
+    - build-tools-28.0.3
+    - android-28
+  licenses:
+    - '.+'
+
+branches:
+  except:
+    - /^travis-.*-build$/
+    - /^.*-nb$/
+    - testing
+
+before_install:
+  - yes | sdkmanager "platforms;android-28"
+  - yes | sdkmanager "build-tools;28.0.3"
+
+before_script:
+  - env
+  - echo $TRAVIS_BRANCH
+  - sed -i -r
+    -e 's/applicationId "[^"]+/\0.'${DEV}'/'
+    -e 's/(versionCode ).*/\1'$(date +%s)'/'
+    -e 's/versionName "[^"]+/\0-'${DEV}'_'${TRAVIS_COMMIT:0:8}_$(date +%F)'/'
+    app/build.gradle
+  - sed -i -r
+    -e 's/(<string name="app_name"[^>]*>[^<]+)/\1 ('${DEV}${SEP}${BRANCH}')/'
+    app/src/main/res/values/strings.xml
+  # Create keystore by running:
+  #   keytool -genkey -v -keystore debug.keystore -storepass android \
+  #     -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 \
+  #     -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+  #
+  # Then base64 encode it with:
+  #   base64 -w0 debug.keystore
+  #
+  # Then add this to Travis environment variables as DEBUG_KEYSTORE (make sure
+  # not to enable displaying value in build logs)"
+  - test -n "$DEBUG_KEYSTORE"
+    && echo "$DEBUG_KEYSTORE" | base64 -d > $HOME/.android/debug.keystore
+    || true
+
+script: ./gradlew testDebug assembleAndroidTest assembleDebug
+
+before_deploy:
+  - ln -s app/build/outputs/apk/debug/app-debug.apk ${APPNAME}-${DEV}${SEP}${BRANCH}-build.apk
+  - git tag -f travis-${DEV}${SEP}${BRANCH}-build
+  - git remote add gh
+    https://${GITHUB_API_USERNAME}:${GITHUB_API_KEY}@github.com/${TRAVIS_REPO_SLUG}.git
+  - git push gh :travis-${DEV}${SEP}${BRANCH}-build || true
+  - git push -f gh travis-${DEV}${SEP}${BRANCH}-build
+  - git remote remove gh
+
+deploy:
+  provider: releases
+  api-key: $GITHUB_API_KEY
+  file: ${APPNAME}-${DEV}${SEP}${BRANCH}-build.apk
+  skip_cleanup: true
+  name: $APPNAME development build (${TRAVIS_BRANCH})
+  body: Automatic $APPNAME development build of $TRAVIS_BRANCH
+    ($TRAVIS_COMMIT) built by Travis CI on $(date +'%F %T %Z').
+  prerelease: true
+  overwrite: true
+  target_commitish: $TRAVIS_COMMIT
+  on:
+    all_branches: true
