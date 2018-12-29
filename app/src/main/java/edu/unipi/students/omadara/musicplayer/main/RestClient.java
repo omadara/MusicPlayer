@@ -46,6 +46,7 @@ public class RestClient {
             @Override
             public void onResponse(final JSONArray jsonAlbums) {
                 final int N = Math.min(maxNumber, jsonAlbums.length());
+                final int[] completedCount = new int[1];
                 for(int i = 0; i < N; i++) {
                     try {
                         JSONObject jsonAlbum = jsonAlbums.getJSONObject(i);
@@ -54,14 +55,17 @@ public class RestClient {
                         album.setTitle(jsonAlbum.getString("name"));
                         album.setArtist(jsonAlbum.getString("artist_name"));
                         album.setTrackCount(jsonAlbum.getInt("track_count"));
+                        album.setDuration(-1);
                         String thumbUrl = jsonAlbum.getString("cover_image_thumb_url").replaceFirst("http:","https:");
                         requestQueue.add(new ImageRequest(thumbUrl, new Response.Listener<Bitmap>() {
                             @Override
                             public void onResponse(Bitmap bitmap) {
                                 album.setThumbnail(bitmap);
+                                if(album.getDuration() != -1) {
+                                    callback.onRequestFinished(album, ++completedCount[0] == N);
+                                }
                             }
                         }, 0, 0, ImageView.ScaleType.CENTER_CROP, Bitmap.Config.RGB_565, errorListener));
-                        final boolean isLast = i == N - 1;
                         requestQueue.add(new JsonArrayRequest(Request.Method.GET, albumsUrl + "/" + album.getId() + "/tracks", null, new Response.Listener<JSONArray>() {
                             @Override
                             public void onResponse(JSONArray jsonTracks) {
@@ -74,7 +78,9 @@ public class RestClient {
                                     }
                                 }
                                 album.setDuration(totalDuration);
-                                callback.onRequestFinished(album, isLast);
+                                if(album.getThumbnail() != null) {
+                                    callback.onRequestFinished(album, ++completedCount[0] == N);
+                                }
                             }
                         }, errorListener));
                     } catch (JSONException e) {
