@@ -12,11 +12,11 @@ import android.widget.ProgressBar;
 
 
 public class AlbumsFragment extends Fragment {
-    public interface OnAlbumsFragmentInteractionListener {
+    public interface AlbumEventListener {
         void onAlbumClick(Album album);
     }
     private AlbumAdapter adapter;
-    private OnAlbumsFragmentInteractionListener mListener;
+    private AlbumEventListener mListener;
 
     public AlbumsFragment() {
         // Required empty public constructor
@@ -39,18 +39,18 @@ public class AlbumsFragment extends Fragment {
                 adapter.addAlbum(album);
                 if(isLast) loading.setVisibility(View.INVISIBLE);
             }
-        }, 10, null);
+        }, 3, null);
         return view;
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnAlbumsFragmentInteractionListener) {
-            mListener = (OnAlbumsFragmentInteractionListener) context;
+        if (context instanceof AlbumEventListener) {
+            mListener = (AlbumEventListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnAlbumsFragmentInteractionListener");
+                    + " must implement AlbumEventListener");
         }
     }
 

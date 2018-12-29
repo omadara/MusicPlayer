@@ -8,16 +8,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import edu.unipi.students.omadara.musicplayer.AlbumsFragment.OnAlbumsFragmentInteractionListener;
+import edu.unipi.students.omadara.musicplayer.AlbumsFragment.AlbumEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> {
     private List<Album> albumList;
-    private OnAlbumsFragmentInteractionListener mListener;
+    private AlbumEventListener mListener;
 
-    public AlbumAdapter(OnAlbumsFragmentInteractionListener mListener) {
+    public AlbumAdapter(AlbumEventListener mListener) {
         this.mListener = mListener;
         this.albumList = new ArrayList<Album>();
     }

@@ -1,21 +1,39 @@
 package edu.unipi.students.omadara.musicplayer;
 
+import android.media.AudioAttributes;
+import android.media.MediaPlayer;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity implements AlbumsFragment.OnAlbumsFragmentInteractionListener, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+
+public class MainActivity extends AppCompatActivity implements AlbumsFragment.AlbumEventListener, AlbumTracksFragment.TrackEventListener,
+        View.OnClickListener, SeekBar.OnSeekBarChangeListener {
     private ViewGroup playerContainer;
     private TextView tvTrackName, tvCurrentTime, tvDuration;
     private Button btnPlayPause, btnStop;
+
+    private MediaPlayer mediaPlayer;
     private SeekBar seekBar;
-    private boolean playing;
+    private Handler seekBarUpdateHandler = new Handler();
+    private Runnable seekBarUpdateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            float completionRatio = (float) mediaPlayer.getCurrentPosition() / mediaPlayer.getDuration();
+            seekBar.setProgress((int)(completionRatio * seekBar.getMax()));
+            seekBarUpdateHandler.postDelayed(this, 1000);
+            tvCurrentTime.setText(Utils.durationToString(mediaPlayer.getCurrentPosition()));
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,21 +52,17 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         btnPlayPause.setOnClickListener(this);
         btnStop.setOnClickListener(this);
         seekBar.setOnSeekBarChangeListener(this);
-
-        Track DELETEME = new Track();
-        DELETEME.setDuration(66666);
-        onTrackClick(DELETEME);
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         Fragment f = getSupportFragmentManager().findFragmentByTag("TAG_TABS");
-        if(f != null && f.isVisible()) {
+        if (f != null && f.isVisible()) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             setTitle(R.string.app_name);
             setActionBarShadow(0);
-        }else{
+        } else {
             setActionBarShadow(10);
         }
     }
@@ -74,36 +88,86 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
         getSupportActionBar().setElevation(dp * getResources().getDisplayMetrics().density);
     }
 
+    @Override
     public void onTrackClick(Track track) {
         playerContainer.setVisibility(View.VISIBLE);
-        btnPlayPause.setBackgroundResource(R.drawable.ic_pause);
-        playerContainer.setBackgroundResource(R.color.playerBackgroundPlayingColor);
         seekBar.setProgress(0);
         tvTrackName.setText(track.getName());
-        tvCurrentTime.setText("0:00");
+        tvCurrentTime.setText(Utils.durationToString(0));
         tvDuration.setText(Utils.durationToString(track.getDuration()));
-        playing = true;
+        if(mediaPlayer == null) {
+            initMediaPlayer();
+        }else{
+            seekBarUpdateHandler.removeCallbacks(seekBarUpdateRunnable);
+            mediaPlayer.reset();
+        }
+        preparePlayer(track.getMediaUrl());
+    }
+
+    private void initMediaPlayer() {
+        mediaPlayer = new MediaPlayer();
+        AudioAttributes.Builder builder = new AudioAttributes.Builder();
+        builder.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC);
+        builder.setUsage(AudioAttributes.USAGE_MEDIA);
+        mediaPlayer.setAudioAttributes(builder.build());
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                resumePlayer();
+            }
+        });
+    }
+
+    private void preparePlayer(String mediaUrl) {
+        try {
+            mediaPlayer.setDataSource(mediaUrl);
+            mediaPlayer.prepareAsync();
+        } catch (IOException e) {
+            Log.e("musicplayer", "IOException while attempting to play from media url.", e);
+        }
+    }
+
+    private void resumePlayer() {
+        btnPlayPause.setBackgroundResource(R.drawable.ic_pause);
+        playerContainer.setBackgroundResource(R.color.playerBackgroundPlayingColor);
+        mediaPlayer.start();
+        seekBarUpdateHandler.post(seekBarUpdateRunnable);
+    }
+
+    private void pausePlayer() {
+        btnPlayPause.setBackgroundResource(R.drawable.ic_play);
+        playerContainer.setBackgroundResource(R.color.playerBackgroundPausedColor);
+        mediaPlayer.pause();
+        seekBarUpdateHandler.removeCallbacks(seekBarUpdateRunnable);
+    }
+
+    private void closePlayer() {
+        playerContainer.setVisibility(View.GONE);
+        mediaPlayer.stop();
+        mediaPlayer.release();
+        mediaPlayer = null;
+        seekBarUpdateHandler.removeCallbacks(seekBarUpdateRunnable);
     }
 
     @Override
     public void onClick(View v) {
-        if(v.getId() == R.id.buttonPlayPause) {
-            playing = !playing;
-            if (playing) {
-                btnPlayPause.setBackgroundResource(R.drawable.ic_pause);
-                playerContainer.setBackgroundResource(R.color.playerBackgroundPlayingColor);
+        if (v.getId() == R.id.buttonPlayPause) {
+            if (!mediaPlayer.isPlaying()) {
+                resumePlayer();
             } else {
-                btnPlayPause.setBackgroundResource(R.drawable.ic_play);
-                playerContainer.setBackgroundResource(R.color.playerBackgroundPausedColor);
+                pausePlayer();
             }
-        }else if(v.getId() == R.id.buttonStop){
-            playerContainer.setVisibility(View.GONE);
+        } else if (v.getId() == R.id.buttonStop) {
+            closePlayer();
         }
     }
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
+        if(!fromUser) return;
+        float completionRatio = (float) progress / seekBar.getMax();
+        mediaPlayer.seekTo((int)(completionRatio * mediaPlayer.getDuration()));
+        tvCurrentTime.setText(Utils.durationToString(mediaPlayer.getCurrentPosition()));
     }
 
     @Override
@@ -114,5 +178,23 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.On
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(mediaPlayer != null) pausePlayer();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(mediaPlayer != null) resumePlayer();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mediaPlayer != null) closePlayer();
     }
 }

@@ -11,10 +11,15 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.unipi.students.omadara.musicplayer.AlbumTracksFragment.TrackEventListener;
+
 public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> {
     private List<Track> trackList;
+    private TrackEventListener mListener;
+    private View selected;
 
-    public TrackAdapter() {
+    public TrackAdapter(TrackEventListener mListener) {
+        this.mListener = mListener;
         this.trackList = new ArrayList<Track>();
     }
 
@@ -27,13 +32,23 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int position) {
         Track t = trackList.get(position);
         viewHolder.track = t;
         viewHolder.name.setText(t.getName());
         viewHolder.duration.setText(Utils.durationToString(t.getDuration()));
 
-        //TODO click listeners interface
+        viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mListener != null) {
+                    mListener.onTrackClick(viewHolder.track);
+                }
+                if(selected != null) selected.setBackgroundResource(android.R.color.white);
+                selected = viewHolder.mView;
+                selected.setBackgroundResource(R.color.selectedTrackColor);
+            }
+        });
     }
 
     @Override

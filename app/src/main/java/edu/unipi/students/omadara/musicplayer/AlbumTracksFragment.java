@@ -18,9 +18,12 @@ import java.util.List;
 
 
 public class AlbumTracksFragment extends Fragment {
+    public interface TrackEventListener {
+        void onTrackClick(Track track);
+    }
     private TrackAdapter adapter;
     private Album album;
-    //TODO track click interface
+    private TrackEventListener mListener;
 
     public AlbumTracksFragment() {
         // Required empty public constructor
@@ -45,7 +48,7 @@ public class AlbumTracksFragment extends Fragment {
         Context context = view.getContext();
         RecyclerView recyclerView = view.findViewById(R.id.tracks_rv);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new TrackAdapter();
+        adapter = new TrackAdapter(mListener);
         recyclerView.setAdapter(adapter);
 
         RestClient.getInstance(context).requestAlbumTracks(album.getId(), new RestClient.Callback<Track>() {
@@ -56,6 +59,17 @@ public class AlbumTracksFragment extends Fragment {
         }, null);
 
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof TrackEventListener) {
+            mListener = (TrackEventListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement TrackEventListener");
+        }
     }
 
 }
