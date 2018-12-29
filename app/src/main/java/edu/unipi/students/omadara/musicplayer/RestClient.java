@@ -98,12 +98,11 @@ public class RestClient {
         }, errorListener));
     }
 
-    public void requestAlbumTracks(String albumId, final Callback<List<Track>> callback, Response.ErrorListener errorListener) {
+    public void requestAlbumTracks(String albumId, final Callback<List<Track>> callback, final List<Track> tracks, Response.ErrorListener errorListener) {
         String tracksUrl = BASE_ENDPOINT + "/albums/" + albumId + "/tracks";
         requestQueue.add(new JsonArrayRequest(Request.Method.GET, tracksUrl, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray jsonTracks) {
-                List<Track> tracks = new ArrayList<>();
                 for(int i = 0; i < jsonTracks.length(); i++) {
                     try {
                         JSONObject jsonTrack = jsonTracks.getJSONObject(i);
@@ -116,6 +115,7 @@ public class RestClient {
                         Log.e("musicplayer", "JSONException trying to read a track.", e);
                     }
                 }
+                callback.onRequestFinished(tracks);
                 callback.onAllRequestsFinished(tracks);
             }
         }, errorListener));
