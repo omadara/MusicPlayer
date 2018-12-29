@@ -22,7 +22,8 @@ import java.util.List;
 
 public class RestClient {
     public interface Callback<T> {
-        void onCall(T t);
+        void onAllRequestsFinished(T t);
+        void onRequestFinished(T t);
     }
     private static RestClient instance;
     private static final String BASE_ENDPOINT = "https://api-core.earbits.com/v1";
@@ -41,13 +42,12 @@ public class RestClient {
         requestQueue.start();
     }
 
-    public void requestAlbums(final Callback<List<Album>> callback, final int maxNumber, final Response.ErrorListener errorListener) {
+    public void requestAlbums(final Callback<List<Album>> callback, final int maxNumber, final List<Album> albums, final Response.ErrorListener errorListener) {
         final String albumsUrl = BASE_ENDPOINT + "/albums";
         final Object getAlbumsTag = new Object();
         requestQueue.add(new JsonArrayRequest(Request.Method.GET, albumsUrl, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(final JSONArray jsonAlbums) {
-                final List<Album> albums = new ArrayList<>();
                 final int N = Math.min(maxNumber, jsonAlbums.length());
                 for(int i = 0; i < N; i++) {
                     try {
@@ -57,6 +57,7 @@ public class RestClient {
                         album.setTitle(jsonAlbum.getString("name"));
                         album.setArtist(jsonAlbum.getString("artist_name"));
                         album.setTrackCount(jsonAlbum.getInt("track_count"));
+                        albums.add(album);
                         String thumbUrl = jsonAlbum.getString("cover_image_thumb_url").replaceFirst("http:","https:");
                         requestQueue.add(new ImageRequest(thumbUrl, new Response.Listener<Bitmap>() {
                             @Override
@@ -78,7 +79,6 @@ public class RestClient {
                                 album.setDuration(totalDuration);
                             }
                         }, errorListener).setTag(getAlbumsTag));
-                        albums.add(album);
                     } catch (JSONException e) {
                         Log.e("musicplayer", "JSONException trying to read from an album json.", e);
                     }
@@ -87,14 +87,15 @@ public class RestClient {
                     int awaitingRequests = N * 2;
                     @Override
                     public void onRequestFinished(Request<Object> request) {
+                        callback.onRequestFinished(albums);
                         if(request.getTag() == getAlbumsTag && --awaitingRequests == 0) {
                             requestQueue.removeRequestFinishedListener(this);
-                            callback.onCall(albums);
+                            callback.onAllRequestsFinished(albums);
                         }
                     }
                 });
             }
-        }, errorListener).setTag(getAlbumsTag));
+        }, errorListener));
     }
 
     public void requestAlbumTracks(String albumId, final Callback<List<Track>> callback, Response.ErrorListener errorListener) {
@@ -115,7 +116,7 @@ public class RestClient {
                         Log.e("musicplayer", "JSONException trying to read a track.", e);
                     }
                 }
-                callback.onCall(tracks);
+                callback.onAllRequestsFinished(tracks);
             }
         }, errorListener));
     }

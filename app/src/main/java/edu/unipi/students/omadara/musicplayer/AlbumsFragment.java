@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -32,15 +33,21 @@ public class AlbumsFragment extends Fragment {
         recyclerView = view.findViewById(R.id.albums_rv);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
+        List<Album> albums = new ArrayList<Album>();
+        recyclerView.setAdapter(new AlbumAdapter(albums, mListener));
+
         final ProgressBar loading = view.findViewById(R.id.progressBar);
         RestClient.getInstance(this.getContext()).requestAlbums(new RestClient.Callback<List<Album>>() {
             @Override
-            public void onCall(List<Album> albums) {
+            public void onAllRequestsFinished(List<Album> albums) {
                 loading.setVisibility(View.INVISIBLE);
-                recyclerView.setVisibility(View.VISIBLE);
-                recyclerView.setAdapter(new AlbumAdapter(albums, mListener));
             }
-        }, 3, null);
+
+            @Override
+            public void onRequestFinished(List<Album> albums) {
+                recyclerView.getAdapter().notifyDataSetChanged();
+            }
+        }, 10, albums, null);
         return view;
     }
 
