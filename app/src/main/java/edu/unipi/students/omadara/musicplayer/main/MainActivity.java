@@ -12,18 +12,21 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 
 import edu.unipi.students.omadara.musicplayer.R;
 import edu.unipi.students.omadara.musicplayer.albums.AlbumTracksFragment;
 import edu.unipi.students.omadara.musicplayer.albums.AlbumsFragment;
+import edu.unipi.students.omadara.musicplayer.genres.Genre;
+import edu.unipi.students.omadara.musicplayer.genres.GenresFragment;
 import edu.unipi.students.omadara.musicplayer.models.Album;
 import edu.unipi.students.omadara.musicplayer.models.Track;
 
 
 public class MainActivity extends AppCompatActivity implements AlbumsFragment.AlbumEventListener, AlbumTracksFragment.TrackEventListener,
-        View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+        View.OnClickListener, SeekBar.OnSeekBarChangeListener, GenresFragment.GenreEventListener {
     private ViewGroup playerContainer;
     private TextView tvTrackName, tvCurrentTime, tvDuration;
     private Button btnPlayPause, btnStop;
@@ -108,6 +111,16 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.Al
             mediaPlayer.reset();
         }
         preparePlayer(track.getMediaUrl());
+    }
+
+    @Override
+    public void onGenreClick(Genre genre) {
+        RestClient.getInstance(this).requestGenreTrack(genre.getId(), new RestClient.Callback<Track>() {
+            @Override
+            public void onRequestFinished(Track track, boolean isLast) {
+                onTrackClick(track);
+            }
+        }, null);
     }
 
     private void initMediaPlayer() {
@@ -203,4 +216,5 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.Al
         super.onDestroy();
         if(mediaPlayer != null) closePlayer();
     }
+
 }

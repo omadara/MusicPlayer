@@ -9,4 +9,5 @@
 
     <string name="album_img_desc_ph">Album Cover</string>
     <string name="track_img_desc_ph">Track Img</string>
+    <string name="genre_cover">Genre Cover</string>
 </resources>

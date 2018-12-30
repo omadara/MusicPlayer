@@ -7,12 +7,12 @@
     tools:context=".albums.AlbumsFragment">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/albums_rv"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible"
-        tools:listitem="@layout/album_item"
-        tools:visibility="visible" />
+        tools:listitem="@layout/album_item" />
 
     <ProgressBar
         android:id="@+id/progressBar"

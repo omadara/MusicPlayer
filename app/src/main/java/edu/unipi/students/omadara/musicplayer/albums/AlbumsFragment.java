@@ -28,10 +28,10 @@ public class AlbumsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_albums, container, false);
+        View view = inflater.inflate(R.layout.recyclerview_progressbar, container, false);
 
         Context context = view.getContext();
-        RecyclerView recyclerView = view.findViewById(R.id.albums_rv);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         adapter = new AlbumAdapter(mListener);
         recyclerView.setAdapter(adapter);

@@ -1,5 +1,6 @@
 package edu.unipi.students.omadara.musicplayer.main;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -10,12 +11,14 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.unipi.students.omadara.musicplayer.genres.Genre;
 import edu.unipi.students.omadara.musicplayer.models.Album;
 import edu.unipi.students.omadara.musicplayer.models.Track;
 
@@ -111,4 +114,54 @@ public class RestClient {
             }
         }, errorListener));
     }
+
+    public void requestGenres(final Callback<Genre> callback, final Response.ErrorListener errorListener) {
+        String genresUrl = BASE_ENDPOINT + "/music_collections?parent_collections=true";
+        requestQueue.add(new JsonArrayRequest(Request.Method.GET, genresUrl, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(final JSONArray jsonGenres) {
+                final int[] completedCount = new int[1];
+                final int N = jsonGenres.length() - 7;
+                for (int i = 0; i < N; i++) {
+                    try {
+                        JSONObject jsonGenre = jsonGenres.getJSONObject(i);
+                        final Genre genre = new Genre();
+                        genre.setId(jsonGenre.getString("id"));
+                        genre.setName(jsonGenre.getString("name"));
+                        String thumbUrl = jsonGenre.getString("thumbnail_url").replaceFirst("http:","https:");
+                        requestQueue.add(new ImageRequest(thumbUrl, new Response.Listener<Bitmap>() {
+                            @Override
+                            public void onResponse(Bitmap bitmap) {
+                                genre.setThumbnail(bitmap);
+                                callback.onRequestFinished(genre, ++completedCount[0] == N);
+                            }
+                        }, 0, 0, ImageView.ScaleType.CENTER_CROP, Bitmap.Config.RGB_565, errorListener));
+                    } catch (JSONException e) {
+                        Log.e("musicplayer", "JSONException trying to read a genre.", e);
+                    }
+
+                }
+            }
+        }, errorListener));
+    }
+
+    public void requestGenreTrack(String genreId, final Callback<Track> callback, Response.ErrorListener errorListener) {
+        String streamUrl = "http://streaming.earbits.com/api/v1/stream.json?collection_id=" + genreId;
+        requestQueue.add(new JsonObjectRequest(Request.Method.GET, streamUrl, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    Track track = new Track();
+                    JSONObject jsonTrack = response.getJSONObject("track");
+                    track.setName(jsonTrack.getString("artist_name") + " - " + jsonTrack.getString("name"));
+                    track.setDuration(jsonTrack.getInt("duration"));
+                    track.setMediaUrl(jsonTrack.getString("media_file"));
+                    callback.onRequestFinished(track, true);
+                } catch (JSONException e) {
+                    Log.e("musicplayer", "JSONException trying to read a track.", e);
+                }
+            }
+        }, errorListener));
+    }
+
 }
