@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import java.util.List;
+
 import edu.unipi.students.omadara.musicplayer.R;
 import edu.unipi.students.omadara.musicplayer.albums.AlbumAdapter;
 import edu.unipi.students.omadara.musicplayer.albums.AlbumsFragment;
@@ -21,6 +23,7 @@ import edu.unipi.students.omadara.musicplayer.main.RestClient;
 public class GenresFragment extends Fragment {
     public interface GenreEventListener {
         void onGenreClick(Genre genre);
+        void onGenresLoaded(List<Genre> genreList);
     }
     private GenresRecyclerViewAdapter adapter;
     private GenreEventListener mListener;
@@ -44,7 +47,10 @@ public class GenresFragment extends Fragment {
             @Override
             public void onRequestFinished(Genre genre, boolean isLast) {
                 adapter.addGenre(genre);
-                if(isLast) loading.setVisibility(View.INVISIBLE);
+                if(isLast) {
+                    loading.setVisibility(View.INVISIBLE);
+                    mListener.onGenresLoaded(adapter.getGenreList());
+                }
             }
         }, null);
 

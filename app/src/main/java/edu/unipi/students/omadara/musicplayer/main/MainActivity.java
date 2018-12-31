@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.List;
 
 import edu.unipi.students.omadara.musicplayer.R;
 import edu.unipi.students.omadara.musicplayer.albums.AlbumTracksFragment;
@@ -27,6 +28,7 @@ import edu.unipi.students.omadara.musicplayer.models.Track;
 
 public class MainActivity extends AppCompatActivity implements AlbumsFragment.AlbumEventListener, AlbumTracksFragment.TrackEventListener,
         View.OnClickListener, SeekBar.OnSeekBarChangeListener, GenresFragment.GenreEventListener {
+    private TabsFragment tabsFragment;
     private ViewGroup playerContainer;
     private TextView tvTrackName, tvCurrentTime, tvDuration;
     private Button btnPlayPause, btnStop;
@@ -49,8 +51,9 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.Al
         super.onCreate(savedInstanceState);
         getSupportActionBar().setElevation(0); //remove actionbar shadow
         setContentView(R.layout.activity_main);
+        tabsFragment = new TabsFragment();
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.mainFragmentContainer, new TabsFragment(), "TAG_TABS").commit();
+                .replace(R.id.mainFragmentContainer, tabsFragment, "TAG_TABS").commit();
         tvTrackName = findViewById(R.id.tvTrackName);
         tvCurrentTime = findViewById(R.id.tvCurrentTime);
         tvDuration = findViewById(R.id.tvDuration);
@@ -121,6 +124,12 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.Al
                 onTrackClick(track);
             }
         }, null);
+    }
+
+    @Override
+    public void onGenresLoaded(List<Genre> genreList) {
+        RecommendedFragment fragment = (RecommendedFragment) tabsFragment.getTabFragment(2);
+        fragment.onGenresLoaded(genreList);
     }
 
     private void initMediaPlayer() {

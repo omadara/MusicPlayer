@@ -13,6 +13,7 @@ import edu.unipi.students.omadara.musicplayer.R;
 
 
 public class TabsFragment extends Fragment {
+    private TabsFragmentPagerAdapter adapter;
 
     public TabsFragment() {
         // Required empty public constructor
@@ -29,11 +30,15 @@ public class TabsFragment extends Fragment {
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
         ViewPager pager = view.findViewById(R.id.viewPager);
         pager.setOffscreenPageLimit(2);//fortwnei mexri kai 2 geitonika tabs
-        pager.setAdapter(new TabsFragmentPagerAdapter(getChildFragmentManager()));
+        adapter = new TabsFragmentPagerAdapter(getChildFragmentManager());
+        pager.setAdapter(adapter);
         tabLayout.setupWithViewPager(pager);
         tabLayout.getTabAt(0).setText(R.string.tabItemAlbums);
         tabLayout.getTabAt(1).setText(R.string.tabItemGenres);
-        tabLayout.getTabAt(2).setText(R.string.tabItemPlaylists);
+        tabLayout.getTabAt(2).setText(R.string.tabItemRecommended);
     }
 
+    public Fragment getTabFragment(int i) {
+        return adapter.getItem(i);
+    }
 }

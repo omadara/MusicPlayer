@@ -11,4 +11,5 @@
     <color name="playerBackgroundPausedColor">#1a237e</color>
     <color name="selectedTrackColor">#abb8fe</color>
     <color name="genreSelectedColor">#64abb8fe</color>
+    <color name="recommendAddBackgroundColor">#e7e7e7</color>
 </resources>

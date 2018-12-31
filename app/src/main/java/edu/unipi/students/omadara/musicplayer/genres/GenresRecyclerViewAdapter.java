@@ -54,6 +54,10 @@ public class GenresRecyclerViewAdapter extends RecyclerView.Adapter<GenresRecycl
         notifyItemInserted(genreList.size() - 1);
     }
 
+    public List<Genre> getGenreList() {
+        return genreList;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final ImageView image;

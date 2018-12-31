@@ -2,10 +2,7 @@
     <string name="app_name">Music Player</string>
     <string name="tabItemAlbums">ALBUMS</string>
     <string name="tabItemGenres">GENRES</string>
-    <string name="tabItemPlaylists">PLAYLISTS</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tabItemRecommended">RECOMMENDED</string>
 
     <string name="album_img_desc_ph">Album Cover</string>
     <string name="track_img_desc_ph">Track Img</string>

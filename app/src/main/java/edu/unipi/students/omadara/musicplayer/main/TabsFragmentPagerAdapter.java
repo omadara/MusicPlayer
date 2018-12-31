@@ -20,7 +20,7 @@ public class TabsFragmentPagerAdapter extends FragmentPagerAdapter {
             switch (position) {
                 case 0: fragments[position] = new AlbumsFragment(); break;
                 case 1: fragments[position] = new GenresFragment(); break;
-                case 2: fragments[position] = new PlaylistsFragment(); break;
+                case 2: fragments[position] = new RecommendedFragment(); break;
             }
         }
         return fragments[position];
