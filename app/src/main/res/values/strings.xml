@@ -7,4 +7,9 @@
     <string name="album_img_desc_ph">Album Cover</string>
     <string name="track_img_desc_ph">Track Img</string>
     <string name="genre_cover">Genre Cover</string>
+    <string name="recommended_genre_label">Recommended Genre</string>
+    <string name="recommend_me">Recommend me</string>
+    <string name="when_i_am_at">When i am at</string>
+    <string name="latitude_longitude">latitude, longitude</string>
+    <string name="add">Add</string>
 </resources>

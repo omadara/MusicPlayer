@@ -41,7 +41,7 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
             }
         }, false, null);
 
-        layoutAddRec = view.findViewById(R.id.layoutAddRecommendation);
+        layoutAddRec = view.findViewById(R.id.layoutRecAdd);
         FloatingActionButton fab = view.findViewById(R.id.floatingActionButton);
         fab.setOnClickListener(this);
 
