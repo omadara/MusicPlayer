@@ -4,26 +4,19 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import java.util.List;
-
 import edu.unipi.students.omadara.musicplayer.R;
-import edu.unipi.students.omadara.musicplayer.albums.AlbumAdapter;
-import edu.unipi.students.omadara.musicplayer.albums.AlbumsFragment;
 import edu.unipi.students.omadara.musicplayer.main.RestClient;
 
 
 public class GenresFragment extends Fragment {
     public interface GenreEventListener {
         void onGenreClick(Genre genre);
-        void onGenresLoaded(List<Genre> genreList);
     }
     private GenresRecyclerViewAdapter adapter;
     private GenreEventListener mListener;
@@ -47,12 +40,9 @@ public class GenresFragment extends Fragment {
             @Override
             public void onRequestFinished(Genre genre, boolean isLast) {
                 adapter.addGenre(genre);
-                if(isLast) {
-                    loading.setVisibility(View.INVISIBLE);
-                    mListener.onGenresLoaded(adapter.getGenreList());
-                }
+                if(isLast) loading.setVisibility(View.INVISIBLE);
             }
-        }, null);
+        }, true, null);
 
         return view;
     }

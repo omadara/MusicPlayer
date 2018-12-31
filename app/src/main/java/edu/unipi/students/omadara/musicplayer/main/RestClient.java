@@ -1,6 +1,5 @@
 package edu.unipi.students.omadara.musicplayer.main;
 
-import android.app.DownloadManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -115,7 +114,7 @@ public class RestClient {
         }, errorListener));
     }
 
-    public void requestGenres(final Callback<Genre> callback, final Response.ErrorListener errorListener) {
+    public void requestGenres(final Callback<Genre> callback, final boolean withThumbnails, final Response.ErrorListener errorListener) {
         String genresUrl = BASE_ENDPOINT + "/music_collections?parent_collections=true";
         requestQueue.add(new JsonArrayRequest(Request.Method.GET, genresUrl, null, new Response.Listener<JSONArray>() {
             @Override
@@ -128,14 +127,18 @@ public class RestClient {
                         final Genre genre = new Genre();
                         genre.setId(jsonGenre.getString("id"));
                         genre.setName(jsonGenre.getString("name"));
-                        String thumbUrl = jsonGenre.getString("thumbnail_url").replaceFirst("http:","https:");
-                        requestQueue.add(new ImageRequest(thumbUrl, new Response.Listener<Bitmap>() {
-                            @Override
-                            public void onResponse(Bitmap bitmap) {
-                                genre.setThumbnail(bitmap);
-                                callback.onRequestFinished(genre, ++completedCount[0] == N);
-                            }
-                        }, 0, 0, ImageView.ScaleType.CENTER_CROP, Bitmap.Config.RGB_565, errorListener));
+                        if(withThumbnails) {
+                            String thumbUrl = jsonGenre.getString("thumbnail_url").replaceFirst("http:","https:");
+                            requestQueue.add(new ImageRequest(thumbUrl, new Response.Listener<Bitmap>() {
+                                @Override
+                                public void onResponse(Bitmap bitmap) {
+                                    genre.setThumbnail(bitmap);
+                                    callback.onRequestFinished(genre, ++completedCount[0] == N);
+                                }
+                            }, 0, 0, ImageView.ScaleType.CENTER_CROP, Bitmap.Config.RGB_565, errorListener));
+                        }else{
+                            callback.onRequestFinished(genre, ++completedCount[0] == N);
+                        }
                     } catch (JSONException e) {
                         Log.e("musicplayer", "JSONException trying to read a genre.", e);
                     }

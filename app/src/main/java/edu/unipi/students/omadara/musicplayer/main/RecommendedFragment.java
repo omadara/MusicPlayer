@@ -29,6 +29,18 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         View view = inflater.inflate(R.layout.fragment_recommended, container, false);
         genreDropDown = view.findViewById(R.id.genreDropDown);
 
+        RestClient.getInstance(this.getContext()).requestGenres(new RestClient.Callback<Genre>() {
+            private List<String> genreListString = new ArrayList<>();
+            @Override
+            public void onRequestFinished(Genre genre, boolean isLast) {
+                genreListString.add(genre.getName());
+                if(isLast) {
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, genreListString);
+                    genreDropDown.setAdapter(adapter);
+                }
+            }
+        }, false, null);
+
         layoutAddRec = view.findViewById(R.id.layoutAddRecommendation);
         FloatingActionButton fab = view.findViewById(R.id.floatingActionButton);
         fab.setOnClickListener(this);
@@ -39,12 +51,5 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View v) {
         layoutAddRec.setVisibility(layoutAddRec.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
-    }
-
-    public void onGenresLoaded(List<Genre> genreList) {
-        List<String> genreListString = new ArrayList<>();
-        for(Genre g : genreList) genreListString.add(g.getName());
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, genreListString);
-        genreDropDown.setAdapter(adapter);
     }
 }

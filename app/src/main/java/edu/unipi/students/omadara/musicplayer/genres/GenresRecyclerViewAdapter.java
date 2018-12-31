@@ -17,6 +17,7 @@ import edu.unipi.students.omadara.musicplayer.R;
 public class GenresRecyclerViewAdapter extends RecyclerView.Adapter<GenresRecyclerViewAdapter.ViewHolder> {
     private List<Genre> genreList = new ArrayList<>();
     private GenresFragment.GenreEventListener mListener;
+    private View selected;
 
     public GenresRecyclerViewAdapter(GenresFragment.GenreEventListener mListener) {
         this.mListener = mListener;
@@ -40,6 +41,9 @@ public class GenresRecyclerViewAdapter extends RecyclerView.Adapter<GenresRecycl
             @Override
             public void onClick(View v) {
                 if(mListener != null) mListener.onGenreClick(viewHolder.genre);
+                if(selected != null) selected.setBackgroundResource(android.R.color.white);
+                selected = viewHolder.mView;
+                selected.setBackgroundResource(R.color.selectedTrackColor);
             }
         });
     }

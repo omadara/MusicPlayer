@@ -126,12 +126,6 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.Al
         }, null);
     }
 
-    @Override
-    public void onGenresLoaded(List<Genre> genreList) {
-        RecommendedFragment fragment = (RecommendedFragment) tabsFragment.getTabFragment(2);
-        fragment.onGenresLoaded(genreList);
-    }
-
     private void initMediaPlayer() {
         mediaPlayer = new MediaPlayer();
         AudioAttributes.Builder builder = new AudioAttributes.Builder();
