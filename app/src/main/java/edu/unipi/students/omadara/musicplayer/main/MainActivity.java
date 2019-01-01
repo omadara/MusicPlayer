@@ -1,5 +1,6 @@
 package edu.unipi.students.omadara.musicplayer.main;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.os.Handler;

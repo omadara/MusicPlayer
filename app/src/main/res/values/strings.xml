@@ -12,4 +12,7 @@
     <string name="when_i_am_at">When i am at</string>
     <string name="latitude_longitude">latitude, longitude</string>
     <string name="add">Add</string>
+    <string name="noRecommendedGenrePrompt">No recommendations found.</string>
+    <string name="invalidCoordinates">Invalid coordinates.</string>
+    <string name="gpsPermissionDenied">GPS permission denied.</string>
 </resources>

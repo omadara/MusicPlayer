@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -16,6 +17,9 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.unipi.students.omadara.musicplayer.genres.Genre;
 import edu.unipi.students.omadara.musicplayer.models.Album;
@@ -150,7 +154,8 @@ public class RestClient {
 
     public void requestGenreTrack(String genreId, final Callback<Track> callback, Response.ErrorListener errorListener) {
         String streamUrl = "http://streaming.earbits.com/api/v1/stream.json?collection_id=" + genreId;
-        requestQueue.add(new JsonObjectRequest(Request.Method.GET, streamUrl, null, new Response.Listener<JSONObject>() {
+        requestQueue.getCache().clear();
+        Request request = new JsonObjectRequest(Request.Method.GET, streamUrl, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -164,7 +169,16 @@ public class RestClient {
                     Log.e("musicplayer", "JSONException trying to read a track.", e);
                 }
             }
-        }, errorListener));
+        }, errorListener) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Cache-Control", "max-age=0,no-cache");
+                return headers;
+            }
+        };
+        request.setShouldCache(false);
+        requestQueue.add(request);
     }
 
 }
