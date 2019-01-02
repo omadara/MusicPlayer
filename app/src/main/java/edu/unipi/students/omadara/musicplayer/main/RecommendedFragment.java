@@ -1,8 +1,11 @@
 package edu.unipi.students.omadara.musicplayer.main;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -16,6 +19,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -52,12 +56,13 @@ import static android.content.Context.LOCATION_SERVICE;
 
 
 public class RecommendedFragment extends Fragment implements View.OnClickListener {
-    private static final int REQUEST_PERMISSION_CODE_GPS = 12345;
+    private static final int REQUEST_PERMISSIONS_CODE = 12345;
+    private static final int ENABLE_GPS_CODE = 1234;
     private static final int MIN_DISTANCE = 100;
     private Spinner genreDropDown;
     private ViewGroup layoutAddRec;
     private EditText latlon;
-    private SQLiteDatabase db; 
+    private SQLiteDatabase db;
     private TextView prompt, tvGenre;
     private RecyclerView rvTrackList;
     private TrackAdapter trackAdapter;
@@ -155,17 +160,19 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
     }
 
     private void searchForRecommendations() {
-        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             requestLocation();
         }else{
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_CODE_GPS);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSIONS_CODE);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if(requestCode == REQUEST_PERMISSION_CODE_GPS) {
-            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if(requestCode == REQUEST_PERMISSIONS_CODE) {
+            if(grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 requestLocation();
             }else{
                 Toast.makeText(getActivity(), getString(R.string.gpsPermissionDenied), Toast.LENGTH_SHORT).show();
@@ -175,18 +182,45 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
 
     private void requestLocation() throws SecurityException {
         LocationManager locationManager = (LocationManager)getContext().getSystemService(LOCATION_SERVICE);
-        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                gotLocation(location);
-            }
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) { }
-            @Override
-            public void onProviderEnabled(String provider) { }
-            @Override
-            public void onProviderDisabled(String provider) { }
-        }, null);
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            buildAlertMessageNoGps();
+        }else{
+            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    gotLocation(location);
+                }
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) { }
+                @Override
+                public void onProviderEnabled(String provider) { }
+                @Override
+                public void onProviderDisabled(String provider) { }
+            }, null);
+        }
+    }
+
+    private void buildAlertMessageNoGps() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(R.string.turn_on_gps)
+            .setCancelable(false)
+            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), ENABLE_GPS_CODE);
+                }
+            })
+            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+                }
+            }).create().show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == ENABLE_GPS_CODE && resultCode == 0) {
+            requestLocation();
+        }
     }
 
     private void gotLocation(Location currentLoc) {

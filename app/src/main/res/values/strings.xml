@@ -14,6 +14,7 @@
     <string name="add">Add</string>
     <string name="noRecommendedGenrePrompt">No recommended genre found.</string>
     <string name="invalidCoordinates">Invalid coordinates.</string>
-    <string name="gpsPermissionDenied">GPS permission denied.</string>
+    <string name="gpsPermissionDenied">Permission(s) denied.</string>
     <string name="searching_for_recommendations">Searching for recommended genre</string>
+    <string name="turn_on_gps">Turn on GPS?</string>
 </resources>

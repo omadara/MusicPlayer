@@ -1,8 +1,10 @@
 package edu.unipi.students.omadara.musicplayer.main;
 
+import android.content.Intent;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -217,5 +219,4 @@ public class MainActivity extends AppCompatActivity implements AlbumsFragment.Al
         super.onDestroy();
         if(mediaPlayer != null) closePlayer();
     }
-
 }
