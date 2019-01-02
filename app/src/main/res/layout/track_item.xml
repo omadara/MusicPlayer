@@ -25,6 +25,8 @@
         android:layout_marginTop="8dp"
         android:layout_toStartOf="@id/duration"
         android:layout_toEndOf="@+id/track_img"
+        android:ellipsize="end"
+        android:singleLine="true"
         android:textSize="16sp"
         android:textStyle="bold"
         tools:text="Track name" />

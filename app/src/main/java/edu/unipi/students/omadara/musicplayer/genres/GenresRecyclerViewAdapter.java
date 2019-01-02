@@ -1,6 +1,5 @@
 package edu.unipi.students.omadara.musicplayer.genres;
 
-import android.content.res.ColorStateList;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.unipi.students.omadara.musicplayer.R;
+import edu.unipi.students.omadara.musicplayer.models.Genre;
 
 public class GenresRecyclerViewAdapter extends RecyclerView.Adapter<GenresRecyclerViewAdapter.ViewHolder> {
     private List<Genre> genreList = new ArrayList<>();

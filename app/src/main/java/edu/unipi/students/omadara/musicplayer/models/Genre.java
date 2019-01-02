@@ -1,4 +1,4 @@
-package edu.unipi.students.omadara.musicplayer.genres;
+package edu.unipi.students.omadara.musicplayer.models;
 
 import android.graphics.Bitmap;
 

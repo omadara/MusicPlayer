@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 
 import edu.unipi.students.omadara.musicplayer.R;
 import edu.unipi.students.omadara.musicplayer.main.RestClient;
+import edu.unipi.students.omadara.musicplayer.models.Genre;
 
 
 public class GenresFragment extends Fragment {

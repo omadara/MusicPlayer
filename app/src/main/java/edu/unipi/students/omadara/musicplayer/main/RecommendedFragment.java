@@ -10,7 +10,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -24,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,7 +36,7 @@ import java.util.Map;
 import edu.unipi.students.omadara.musicplayer.R;
 import edu.unipi.students.omadara.musicplayer.albums.AlbumTracksFragment;
 import edu.unipi.students.omadara.musicplayer.albums.TrackAdapter;
-import edu.unipi.students.omadara.musicplayer.genres.Genre;
+import edu.unipi.students.omadara.musicplayer.models.Genre;
 import edu.unipi.students.omadara.musicplayer.models.Track;
 
 import static android.content.Context.LOCATION_SERVICE;
@@ -53,6 +53,7 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
     private RecyclerView rvTrackList;
     private TrackAdapter trackAdapter;
     private Map<String, String> genresIDs;
+    private ProgressBar loading;
 
     public RecommendedFragment() {
         // Required empty public constructor
@@ -68,6 +69,7 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         Button buttonAdd = view.findViewById(R.id.buttonAdd);
         layoutAddRec = view.findViewById(R.id.layoutRecAdd);
         latlon = view.findViewById(R.id.editTextLatLon);
+        loading = view.findViewById(R.id.progressBar);
         rvTrackList = view.findViewById(R.id.recyclerView);
         rvTrackList.setLayoutManager(new LinearLayoutManager(getContext()));
         trackAdapter = new TrackAdapter((AlbumTracksFragment.TrackEventListener)getActivity());
@@ -104,10 +106,9 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
     }
 
     private void searchForRecommendations() {
-        //elenxos an exei e3ousiodoth8ei me to location permission
         if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             requestLocation();
-        }else{ //an oxi rwtaei to xrhsth (to apotelesma to pairnei apo th me8odo onRequestPermissionsResult())
+        }else{
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION_CODE_GPS);
         }
     }
@@ -115,10 +116,9 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if(requestCode == REQUEST_PERMISSION_CODE_GPS) {
-            //apodexthke to aithma
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 requestLocation();
-            }else{ //aperripse to aithma
+            }else{
                 Toast.makeText(getActivity(), getString(R.string.gpsPermissionDenied), Toast.LENGTH_SHORT).show();
             }
         }
@@ -160,26 +160,21 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
 
     private void gotRecommendedGenre(@Nullable String genreName) {
         if(genreName == null){
-            tvGenre.setText("");
             prompt.setText(getString(R.string.noRecommendedGenrePrompt));
+            tvGenre.setText("");
         }else{
+            prompt.setText(R.string.recommended_genre_label);
             tvGenre.setText(genreName);
-            String genreId = genresIDs.get(genreName);
-            for(int i = 0; i < 10; i++) {
-                addTrackToRecyclerView(genreId);
-            }
+            final String genreId = genresIDs.get(genreName);
+            RestClient.getInstance(getContext()).requestSubGenreTracks(genreId, new RestClient.Callback<Track>() {
+                @Override
+                public void onRequestFinished(Track track, boolean isLast) {
+                    trackAdapter.addTrack(track);
+                    if(isLast) loading.setVisibility(View.GONE);
+                }
+            }, null);
         }
     }
-
-    private void addTrackToRecyclerView(String genreId) {
-        RestClient.getInstance(getContext()).requestGenreTrack(genreId, new RestClient.Callback<Track>() {
-            @Override
-            public void onRequestFinished(Track track, boolean isLast) {
-                trackAdapter.addTrack(track);
-            }
-        }, null);
-    }
-
 
     @Override
     public void onClick(View v) {

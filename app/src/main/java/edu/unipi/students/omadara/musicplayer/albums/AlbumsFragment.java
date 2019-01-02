@@ -43,7 +43,7 @@ public class AlbumsFragment extends Fragment {
                 adapter.addAlbum(album);
                 if(isLast) loading.setVisibility(View.INVISIBLE);
             }
-        }, 3, null);
+        }, 30, null);
         return view;
     }
 

@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -18,10 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import edu.unipi.students.omadara.musicplayer.genres.Genre;
+import edu.unipi.students.omadara.musicplayer.models.Genre;
 import edu.unipi.students.omadara.musicplayer.models.Album;
 import edu.unipi.students.omadara.musicplayer.models.Track;
 
@@ -154,8 +150,7 @@ public class RestClient {
 
     public void requestGenreTrack(String genreId, final Callback<Track> callback, Response.ErrorListener errorListener) {
         String streamUrl = "http://streaming.earbits.com/api/v1/stream.json?collection_id=" + genreId;
-        requestQueue.getCache().clear();
-        Request request = new JsonObjectRequest(Request.Method.GET, streamUrl, null, new Response.Listener<JSONObject>() {
+        requestQueue.add(new JsonObjectRequest(Request.Method.GET, streamUrl, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -169,16 +164,31 @@ public class RestClient {
                     Log.e("musicplayer", "JSONException trying to read a track.", e);
                 }
             }
-        }, errorListener) {
+        }, errorListener));
+    }
+
+    public void requestSubGenreTracks(String genreId, final Callback<Track> callback, final Response.ErrorListener errorListener) {
+        String subGenresUrl = BASE_ENDPOINT + "/music_collections/" + genreId + "/child_collections";
+        requestQueue.add(new JsonArrayRequest(Request.Method.GET, subGenresUrl, null, new Response.Listener<JSONArray>() {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Cache-Control", "max-age=0,no-cache");
-                return headers;
+            public void onResponse(JSONArray jsonSubGenres) {
+                final int[] completedCount = new int[1];
+                final int N = jsonSubGenres.length();
+                for (int i = 0; i < N; i++) {
+                    try {
+                        String subGenreId = jsonSubGenres.getJSONObject(i).getString("id");
+                        requestGenreTrack(subGenreId, new Callback<Track>() {
+                            @Override
+                            public void onRequestFinished(Track track, boolean isLast) {
+                                callback.onRequestFinished(track, ++completedCount[0] == N);
+                            }
+                        }, errorListener);
+                    } catch (JSONException e) {
+                        Log.e("musicplayer", "JSONException trying to read a subgenre's id.", e);
+                    }
+                }
             }
-        };
-        request.setShouldCache(false);
-        requestQueue.add(request);
+        }, errorListener));
     }
 
 }

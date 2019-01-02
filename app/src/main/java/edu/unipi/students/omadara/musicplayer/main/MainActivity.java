@@ -1,6 +1,5 @@
 package edu.unipi.students.omadara.musicplayer.main;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -13,15 +12,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.IOException;
-import java.util.List;
 
 import edu.unipi.students.omadara.musicplayer.R;
 import edu.unipi.students.omadara.musicplayer.albums.AlbumTracksFragment;
 import edu.unipi.students.omadara.musicplayer.albums.AlbumsFragment;
-import edu.unipi.students.omadara.musicplayer.genres.Genre;
+import edu.unipi.students.omadara.musicplayer.models.Genre;
 import edu.unipi.students.omadara.musicplayer.genres.GenresFragment;
 import edu.unipi.students.omadara.musicplayer.models.Album;
 import edu.unipi.students.omadara.musicplayer.models.Track;
