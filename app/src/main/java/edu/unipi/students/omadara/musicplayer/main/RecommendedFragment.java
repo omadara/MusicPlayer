@@ -55,7 +55,7 @@ import edu.unipi.students.omadara.musicplayer.models.Track;
 import static android.content.Context.LOCATION_SERVICE;
 
 
-public class RecommendedFragment extends Fragment implements View.OnClickListener {
+public class RecommendedFragment extends Fragment implements View.OnClickListener, Marker.OnMarkerClickListener {
     private static final int REQUEST_PERMISSIONS_CODE = 12345;
     private static final int ENABLE_GPS_CODE = 1234;
     private static final int MIN_DISTANCE = 100;
@@ -71,6 +71,7 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
     private MapView mapView;
     private Marker clickMarker;
     private Polygon clickMarkerRange;
+    private ArrayList<Marker> prefMarkers;
 
     public RecommendedFragment() {
         // Required empty public constructor
@@ -94,6 +95,7 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         fab.setOnClickListener(this);
         buttonAdd.setOnClickListener(this);
         genresIDs = new HashMap<>();
+        prefMarkers = new ArrayList<>();
 
         initDropDownAsync();
         initDatabase();
@@ -134,6 +136,8 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
                 return false;
             }
         }));
+
+        mapRenderPrefMarkers();
 
         return view;
     }
@@ -259,6 +263,24 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         }
     }
 
+    private void mapRenderPrefMarkers() {
+        mapView.getOverlays().removeAll(prefMarkers);
+        prefMarkers.clear();
+        try(Cursor c = db.rawQuery("SELECT genre,lat,lon FROM pref", null)) {
+            while(c.moveToNext()) {
+                Marker m = new Marker(mapView);
+                m.setPosition(new GeoPoint(c.getDouble(1), c.getDouble(2)));
+                m.setTitle(c.getString(0));
+                m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                m.setIcon(getResources().getDrawable(R.drawable.ic_music_note_circ));
+                m.setOnMarkerClickListener(this);
+                prefMarkers.add(m);
+            }
+        }
+        mapView.getOverlays().addAll(prefMarkers);
+        mapView.invalidate();
+    }
+
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.floatingActionButton){
@@ -279,7 +301,17 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
             contentValues.put("lon", lon);
             contentValues.put("genre", genre);
             db.insert("pref",null, contentValues);
+            mapRenderPrefMarkers();
             Toast.makeText(getActivity(), "Genre '" + genre + "' added for the location.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker, MapView mapView) {
+        if (!marker.isInfoWindowShown())
+            marker.showInfoWindow();
+        latlon.setText(marker.getPosition().toDoubleString());
+        //  TODO  edit this pref and update db
+        return true;
     }
 }
