@@ -28,6 +28,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Marker;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +61,8 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
     private TrackAdapter trackAdapter;
     private Map<String, String> genresIDs;
     private ProgressBar loading;
+    private MapView mapView;
+    private Marker clickMarker;
 
     public RecommendedFragment() {
         // Required empty public constructor
@@ -80,6 +89,36 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
 
         initDropDownAsync();
         initDatabase();
+
+        mapView = (MapView) view.findViewById(R.id.osmdroid);
+        mapView.setMultiTouchControls(true);
+        mapView.setTilesScaledToDpi(true);
+        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.getController().setZoom(8.0);
+        mapView.getController().setCenter(new GeoPoint(37.941649, 23.652894));
+
+        clickMarker = new Marker(mapView);
+        clickMarker.setPosition(new GeoPoint(-20.66, -20.66));
+        clickMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        clickMarker.setIcon(getResources().getDrawable(R.drawable.ic_menu_mylocation));
+
+        mapView.getOverlays().add(clickMarker);
+
+        mapView.getOverlays().add(new MapEventsOverlay(new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                latlon.setText(p.toDoubleString());
+                clickMarker.setPosition(p);
+                // mapView.getController().setCenter(p); // move to click position
+                mapView.invalidate();
+                return true;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                return false;
+            }
+        }));
 
         return view;
     }
