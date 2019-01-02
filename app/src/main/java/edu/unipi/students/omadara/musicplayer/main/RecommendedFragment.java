@@ -23,6 +23,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -55,7 +56,7 @@ import edu.unipi.students.omadara.musicplayer.models.Track;
 import static android.content.Context.LOCATION_SERVICE;
 
 
-public class RecommendedFragment extends Fragment implements View.OnClickListener, Marker.OnMarkerClickListener {
+public class RecommendedFragment extends Fragment implements View.OnClickListener, PrefMarker.OnPrefMarkerClickListener {
     private static final int REQUEST_PERMISSIONS_CODE = 12345;
     private static final int ENABLE_GPS_CODE = 1234;
     private static final int MIN_DISTANCE = 100;
@@ -71,7 +72,7 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
     private MapView mapView;
     private Marker clickMarker;
     private Polygon clickMarkerRange;
-    private ArrayList<Marker> prefMarkers;
+    private ArrayList<PrefMarker> prefMarkers;
 
     public RecommendedFragment() {
         // Required empty public constructor
@@ -268,12 +269,12 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         prefMarkers.clear();
         try(Cursor c = db.rawQuery("SELECT genre,lat,lon FROM pref", null)) {
             while(c.moveToNext()) {
-                Marker m = new Marker(mapView);
+                PrefMarker m = new PrefMarker(mapView);
                 m.setPosition(new GeoPoint(c.getDouble(1), c.getDouble(2)));
                 m.setTitle(c.getString(0));
                 m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
                 m.setIcon(getResources().getDrawable(R.drawable.ic_music_note_circ));
-                m.setOnMarkerClickListener(this);
+                m.setOnPrefMarkerClickListener(this);
                 prefMarkers.add(m);
             }
         }
@@ -307,11 +308,18 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
     }
 
     @Override
-    public boolean onMarkerClick(Marker marker, MapView mapView) {
+    public boolean onPrefMarkerLongClick(Marker marker, MapView mapView) {
+        // TODO delete this pref and update db
+        latlon.setText("TODO delete");
+        return true;
+    }
+
+    @Override
+    public boolean onPrefMarkerClick(Marker marker, MapView mapView) {
         if (!marker.isInfoWindowShown())
             marker.showInfoWindow();
         latlon.setText(marker.getPosition().toDoubleString());
-        //  TODO  edit this pref and update db
+        //  TODO handle pref marker click
         return true;
     }
 }
