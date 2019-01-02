@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -34,6 +35,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polygon;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,6 +65,7 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
     private ProgressBar loading;
     private MapView mapView;
     private Marker clickMarker;
+    private Polygon clickMarkerRange;
 
     public RecommendedFragment() {
         // Required empty public constructor
@@ -102,13 +105,20 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         clickMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
         clickMarker.setIcon(getResources().getDrawable(R.drawable.ic_menu_mylocation));
 
+        clickMarkerRange = new Polygon();
+        clickMarkerRange.setPoints(Polygon.pointsAsCircle(new GeoPoint(-20.66, -20.66), MIN_DISTANCE));
+        clickMarkerRange.setFillColor(Color.argb(35, 48, 79, 254));
+        clickMarkerRange.setStrokeColor(Color.argb(0,0,0,0));
+
         mapView.getOverlays().add(clickMarker);
+        mapView.getOverlays().add(clickMarkerRange);
 
         mapView.getOverlays().add(new MapEventsOverlay(new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
                 latlon.setText(p.toDoubleString());
                 clickMarker.setPosition(p);
+                clickMarkerRange.setPoints(Polygon.pointsAsCircle(p, MIN_DISTANCE));
                 // mapView.getController().setCenter(p); // move to click position
                 mapView.invalidate();
                 return true;
