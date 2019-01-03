@@ -79,8 +79,17 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         // Required empty public constructor
     }
 
+    private void changeOsmdroidPath() {
+        //osmdroid external storage permission fix, use local storage
+        org.osmdroid.config.IConfigurationProvider osmConf = org.osmdroid.config.Configuration.getInstance();
+        File osmPath = new File(getContext().getCacheDir().getAbsolutePath(), "osmdroid");
+        osmConf.setOsmdroidBasePath(osmPath);
+        osmConf.setOsmdroidTileCache(osmPath);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        changeOsmdroidPath(); //prepei prin thn inflate()
         View view = inflater.inflate(R.layout.fragment_recommended, container, false);
         genreDropDown = view.findViewById(R.id.genreDropDown);
         prompt = view.findViewById(R.id.prompt);
@@ -101,11 +110,6 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         initDropDownAsync();
         initDatabase();
 
-        //osmdroid external storage permission fix, use local storage
-        org.osmdroid.config.IConfigurationProvider osmConf = org.osmdroid.config.Configuration.getInstance();
-        File osmPath = new File(getContext().getCacheDir().getAbsolutePath(), "osmdroid");
-        osmConf.setOsmdroidBasePath(osmPath);
-        osmConf.setOsmdroidTileCache(osmPath);
         mapView = (MapView) view.findViewById(R.id.osmdroid);
         mapView.setMultiTouchControls(true);
         mapView.setTilesScaledToDpi(true);
@@ -260,18 +264,15 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         centerMapToMyLocation();
         try(Cursor c = db.rawQuery("SELECT genre,lat,lon FROM pref", null)) {
             Location loc = new Location(LocationManager.GPS_PROVIDER);
-            String genre = null;
             while(c.moveToNext()) {
-                genre = c.getString(0);
                 loc.setLatitude(c.getDouble(1));
                 loc.setLongitude(c.getDouble(2));
-                float d = myLocation.distanceTo(loc);
-                if(d < MIN_DISTANCE) {
-                    gotRecommendedGenre(genre);
+                if(myLocation.distanceTo(loc) < MIN_DISTANCE) {
+                    gotRecommendedGenre(c.getString(0));
                     return;
                 }
             }
-            gotRecommendedGenre(genre);
+            gotRecommendedGenre(null);
         }
     }
 
