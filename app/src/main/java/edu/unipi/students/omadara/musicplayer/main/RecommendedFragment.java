@@ -116,18 +116,15 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         centerMapToMyLocation();
 
-        final Marker clickMarker = createMarker(new GeoPoint(-20.66, -20.66), R.drawable.ic_music_note_circ);
-        final Polygon clickMarkerRange = createMarkerCircle(clickMarker.getPosition());
-
-        mapView.getOverlays().add(clickMarkerRange);
-        mapView.getOverlays().add(clickMarker);
-
         eventsOverlay = new MapEventsOverlay(new MapEventsReceiver() {
+            private Overlay prevClickMarker, prevClickMarkerCircle;
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
                 latlon.setText(p.toDoubleString());
-                clickMarker.setPosition(p);
-                clickMarkerRange.setPoints(Polygon.pointsAsCircle(p, MIN_DISTANCE));
+                mapView.getOverlays().remove(prevClickMarker);
+                mapView.getOverlays().remove(prevClickMarkerCircle);
+                mapView.getOverlays().add(prevClickMarker = createMarker(p, R.drawable.ic_music_note_circ));
+                mapView.getOverlays().add(prevClickMarkerCircle = createMarkerCircle(p));
                 mapView.invalidate();
                 return true;
             }
