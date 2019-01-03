@@ -43,6 +43,7 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.Polygon;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -100,6 +101,11 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         initDropDownAsync();
         initDatabase();
 
+        //osmdroid external storage permission fix, use local storage
+        org.osmdroid.config.IConfigurationProvider osmConf = org.osmdroid.config.Configuration.getInstance();
+        File osmPath = new File(getContext().getCacheDir().getAbsolutePath(), "osmdroid");
+        osmConf.setOsmdroidBasePath(osmPath);
+        osmConf.setOsmdroidTileCache(osmPath);
         mapView = (MapView) view.findViewById(R.id.osmdroid);
         mapView.setMultiTouchControls(true);
         mapView.setTilesScaledToDpi(true);
@@ -172,19 +178,17 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
     }
 
     private void searchForRecommendations() {
-        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-            && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             requestLocation();
         }else{
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSIONS_CODE);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSIONS_CODE);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if(requestCode == REQUEST_PERMISSIONS_CODE) {
-            if(grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                    && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 requestLocation();
             }else{
                 Toast.makeText(getActivity(), getString(R.string.gpsPermissionDenied), Toast.LENGTH_SHORT).show();
