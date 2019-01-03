@@ -3,18 +3,29 @@ package edu.unipi.students.omadara.musicplayer.main;
 import android.view.MotionEvent;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.Polygon;
 
 public class PrefMarker extends Marker {
-    protected OnPrefMarkerClickListener mOnPrefMarkerClickListener;
+    protected ClickListener mOnPrefMarkerClickListener;
+    private Overlay circle;
 
     public PrefMarker(MapView mapView) {
         super(mapView);
         mOnPrefMarkerClickListener = null;
     }
 
-    public interface OnPrefMarkerClickListener {
-        abstract boolean onPrefMarkerLongClick(Marker marker, MapView mapView);
-        abstract boolean onPrefMarkerClick(Marker marker, MapView mapView);
+    public void setCircle(Overlay circle) {
+        this.circle = circle;
+    }
+
+    public Overlay getCircle() {
+        return circle;
+    }
+
+    public interface ClickListener {
+        boolean onPrefMarkerLongClick(PrefMarker marker, MapView mapView);
+        boolean onPrefMarkerClick(PrefMarker marker, MapView mapView);
     }
 
     @Override
@@ -27,13 +38,13 @@ public class PrefMarker extends Marker {
         return touched;
     }
 
-    public void setOnPrefMarkerClickListener(final OnPrefMarkerClickListener listener) {
+    public void setOnPrefMarkerClickListener(final ClickListener listener) {
         mOnPrefMarkerClickListener = listener;
         if (listener != null) {
             this.setOnMarkerClickListener(new OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker, MapView mapView) {
-                    return listener.onPrefMarkerClick(marker, mapView);
+                    return listener.onPrefMarkerClick(PrefMarker.this, mapView);
                 }
             });
         }

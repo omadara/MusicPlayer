@@ -40,6 +40,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.Polygon;
 
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ import edu.unipi.students.omadara.musicplayer.models.Track;
 import static android.content.Context.LOCATION_SERVICE;
 
 
-public class RecommendedFragment extends Fragment implements View.OnClickListener, PrefMarker.OnPrefMarkerClickListener {
+public class RecommendedFragment extends Fragment implements View.OnClickListener, PrefMarker.ClickListener {
     private static final int REQUEST_PERMISSIONS_CODE = 12345;
     private static final int ENABLE_GPS_CODE = 1234;
     private static final int MIN_DISTANCE = 100;
@@ -70,9 +71,8 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
     private Map<String, String> genresIDs;
     private ProgressBar loading;
     private MapView mapView;
-    private Marker clickMarker;
-    private Polygon clickMarkerRange;
-    private ArrayList<PrefMarker> prefMarkers;
+    private Overlay eventsOverlay;
+    private Location myLocation;
 
     public RecommendedFragment() {
         // Required empty public constructor
@@ -96,7 +96,6 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         fab.setOnClickListener(this);
         buttonAdd.setOnClickListener(this);
         genresIDs = new HashMap<>();
-        prefMarkers = new ArrayList<>();
 
         initDropDownAsync();
         initDatabase();
@@ -105,29 +104,20 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         mapView.setMultiTouchControls(true);
         mapView.setTilesScaledToDpi(true);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
-        mapView.getController().setZoom(8.0);
-        mapView.getController().setCenter(new GeoPoint(37.941649, 23.652894));
+        centerMapToMyLocation();
 
-        clickMarker = new Marker(mapView);
-        clickMarker.setPosition(new GeoPoint(-20.66, -20.66));
-        clickMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-        clickMarker.setIcon(getResources().getDrawable(R.drawable.ic_menu_mylocation));
+        final Marker clickMarker = createMarker(new GeoPoint(-20.66, -20.66), R.drawable.ic_music_note_circ);
+        final Polygon clickMarkerRange = createMarkerCircle(clickMarker.getPosition());
 
-        clickMarkerRange = new Polygon();
-        clickMarkerRange.setPoints(Polygon.pointsAsCircle(new GeoPoint(-20.66, -20.66), MIN_DISTANCE));
-        clickMarkerRange.setFillColor(Color.argb(35, 48, 79, 254));
-        clickMarkerRange.setStrokeColor(Color.argb(0,0,0,0));
-
-        mapView.getOverlays().add(clickMarker);
         mapView.getOverlays().add(clickMarkerRange);
+        mapView.getOverlays().add(clickMarker);
 
-        mapView.getOverlays().add(new MapEventsOverlay(new MapEventsReceiver() {
+        eventsOverlay = new MapEventsOverlay(new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
                 latlon.setText(p.toDoubleString());
                 clickMarker.setPosition(p);
                 clickMarkerRange.setPoints(Polygon.pointsAsCircle(p, MIN_DISTANCE));
-                // mapView.getController().setCenter(p); // move to click position
                 mapView.invalidate();
                 return true;
             }
@@ -136,11 +126,28 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
             public boolean longPressHelper(GeoPoint p) {
                 return false;
             }
-        }));
+        });
+        mapView.getOverlays().add(eventsOverlay);
 
         mapRenderPrefMarkers();
 
         return view;
+    }
+
+    private Marker createMarker(GeoPoint point, int iconId) {
+        Marker marker = new Marker(mapView);
+        marker.setPosition(point);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        marker.setIcon(getResources().getDrawable(iconId));
+        return marker;
+    }
+
+    private Polygon createMarkerCircle(GeoPoint point) {
+        Polygon circle = new Polygon();
+        circle.setPoints(Polygon.pointsAsCircle(point, MIN_DISTANCE));
+        circle.setFillColor(Color.argb(35, 48, 79, 254));
+        circle.setStrokeColor(Color.argb(0,0,0,0));
+        return circle;
     }
 
     private void initDatabase() {
@@ -228,7 +235,25 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    private void gotLocation(Location currentLoc) {
+    private void centerMapToMyLocation() {
+        if(myLocation == null) {
+            mapView.getController().setZoom(8.0);
+            mapView.getController().setCenter(new GeoPoint(37.941649, 23.652894));
+        }else{
+            Marker myMarker = createMarker(new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude()), R.drawable.ic_menu_mylocation);
+            mapView.getController().setZoom(14.0);
+            mapView.getController().setCenter(myMarker.getPosition());
+            // myMarker < eventsOverlay < ...prefMarkers...
+            mapView.getOverlays().add(0, myMarker);
+            mapView.getOverlays().remove(eventsOverlay);
+            mapView.getOverlays().add(1, eventsOverlay);
+            mapView.invalidate();
+        }
+    }
+
+    private void gotLocation(Location myLocation) {
+        this.myLocation = myLocation;
+        centerMapToMyLocation();
         try(Cursor c = db.rawQuery("SELECT genre,lat,lon FROM pref", null)) {
             Location loc = new Location(LocationManager.GPS_PROVIDER);
             String genre = null;
@@ -236,7 +261,7 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
                 genre = c.getString(0);
                 loc.setLatitude(c.getDouble(1));
                 loc.setLongitude(c.getDouble(2));
-                float d = currentLoc.distanceTo(loc);
+                float d = myLocation.distanceTo(loc);
                 if(d < MIN_DISTANCE) {
                     gotRecommendedGenre(genre);
                     return;
@@ -250,6 +275,7 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         if(genreName == null){
             prompt.setText(getString(R.string.noRecommendedGenrePrompt));
             tvGenre.setText("");
+            loading.setVisibility(View.GONE);
         }else{
             prompt.setText(R.string.recommended_genre_label);
             tvGenre.setText(genreName);
@@ -264,21 +290,26 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
         }
     }
 
+    private PrefMarker createPrefMarker(String title, double lat, double lon) {
+        PrefMarker m = new PrefMarker(mapView);
+        m.setPosition(new GeoPoint(lat, lon));
+        m.setTitle(title);
+        m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        m.setIcon(getResources().getDrawable(R.drawable.ic_music_note_circ));
+        m.setOnPrefMarkerClickListener(this);
+        m.setCircle(createMarkerCircle(m.getPosition()));
+        return m;
+    }
+
     private void mapRenderPrefMarkers() {
-        mapView.getOverlays().removeAll(prefMarkers);
-        prefMarkers.clear();
+        List<Overlay> overlays = mapView.getOverlays();
         try(Cursor c = db.rawQuery("SELECT genre,lat,lon FROM pref", null)) {
             while(c.moveToNext()) {
-                PrefMarker m = new PrefMarker(mapView);
-                m.setPosition(new GeoPoint(c.getDouble(1), c.getDouble(2)));
-                m.setTitle(c.getString(0));
-                m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-                m.setIcon(getResources().getDrawable(R.drawable.ic_music_note_circ));
-                m.setOnPrefMarkerClickListener(this);
-                prefMarkers.add(m);
+                PrefMarker m = createPrefMarker(c.getString(0), c.getDouble(1), c.getDouble(2));
+                overlays.add(m.getCircle());
+                overlays.add(m);
             }
         }
-        mapView.getOverlays().addAll(prefMarkers);
         mapView.invalidate();
     }
 
@@ -302,24 +333,29 @@ public class RecommendedFragment extends Fragment implements View.OnClickListene
             contentValues.put("lon", lon);
             contentValues.put("genre", genre);
             db.insert("pref",null, contentValues);
-            mapRenderPrefMarkers();
+            PrefMarker m = createPrefMarker(genre, lat, lon);
+            mapView.getOverlays().add(m.getCircle());
+            mapView.getOverlays().add(m);
+            mapView.invalidate();
             Toast.makeText(getActivity(), "Genre '" + genre + "' added for the location.", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public boolean onPrefMarkerLongClick(Marker marker, MapView mapView) {
-        // TODO delete this pref and update db
-        latlon.setText("TODO delete");
+    public boolean onPrefMarkerLongClick(PrefMarker marker, MapView mapView) {
+        mapView.getOverlays().remove(marker);
+        mapView.getOverlays().remove(marker.getCircle());
+        mapView.invalidate();
+        String lat = String.valueOf(marker.getPosition().getLatitude());
+        String lon = String.valueOf(marker.getPosition().getLongitude());
+        db.delete("pref", "lat=? AND lon=?", new String[]{lat, lon});
         return true;
     }
 
     @Override
-    public boolean onPrefMarkerClick(Marker marker, MapView mapView) {
+    public boolean onPrefMarkerClick(PrefMarker marker, MapView mapView) {
         if (!marker.isInfoWindowShown())
             marker.showInfoWindow();
-        latlon.setText(marker.getPosition().toDoubleString());
-        //  TODO handle pref marker click
         return true;
     }
 }
